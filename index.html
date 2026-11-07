@@ -210,6 +210,32 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
   .hx-hero,.hx-hero::before,.hx-hero::after,.hx-title .g,.hx-orb,.hx-btn,.hx-btn::after,.hx-track,.hx-dot,.hx-help{animation:none!important}
   .hx-rv{opacity:1;transform:none;transition:none}
 }
+
+/* ===== Étapes + bouton retour ===== */
+.tb{display:flex;align-items:flex-start;gap:12px;margin:4px 0 8px}
+.tb .stp{flex:1}
+.mini{flex:none;width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:1.5rem;font-weight:700;line-height:1;cursor:pointer;display:grid;place-items:center;padding:0 0 3px;transition:transform .15s,border-color .15s}
+.mini:hover{border-color:var(--green)}.mini:active{transform:scale(.92)}
+.stp{list-style:none;margin:0;padding:0;display:flex}
+.stp li{flex:1;position:relative;text-align:center;min-width:0}
+.stp li::before{content:"";position:absolute;top:12px;right:50%;width:100%;height:3px;background:var(--line);border-radius:3px;transition:background .4s}
+.stp li:first-child::before{display:none}
+.stp li.done::before,.stp li.cur::before{background:var(--green)}
+.stp .d{position:relative;z-index:1;display:grid;place-items:center;width:27px;height:27px;margin:0 auto;border-radius:50%;font-size:.78rem;font-weight:800;background:var(--surface);border:2px solid var(--line);color:var(--muted);transition:all .3s}
+.stp li.done .d{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+.stp li.cur .d{background:var(--orange);border-color:var(--orange);color:#1b1100;animation:stpPulse 1.8s infinite}
+.stp .t{display:block;margin-top:4px;font-size:.68rem;color:var(--muted);font-weight:500;overflow-wrap:anywhere;line-height:1.15}
+.stp li.cur .t{color:var(--fg);font-weight:700}
+@keyframes stpPulse{70%{box-shadow:0 0 0 8px rgba(240,125,0,0)}100%{box-shadow:0 0 0 0 rgba(240,125,0,0)}}
+.sh-top{display:flex;align-items:flex-start;gap:10px}
+.sh-top .stp{flex:1}
+.sh-top .close{align-self:center;flex:none}
+.dnbox{display:grid;gap:6px;justify-items:center;text-align:center;padding:14px;border-radius:14px;background:var(--green-soft)}
+.dnbox .ok{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:var(--green-ink);font-size:1.7rem;font-weight:800;animation:okPop .5s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes okPop{from{transform:scale(0)}to{transform:scale(1)}}
+.panel>*{animation:panelIn .3s ease both}
+@keyframes panelIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.stp li.cur .d,.dnbox .ok,.panel>*{animation:none!important}}
 </style>
 
 <div class="wrap">
@@ -243,28 +269,27 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
 
 <div class="sheet" id="sheet" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-label="Ma commande">
-    <button class="close" id="closeCart" type="button">Fermer</button>
-    <h2>Ma commande</h2>
-    <p class="note">Une seule commande à la fois. Choisir un autre forfait remplace celui-ci.</p>
+    <div class="sh-top"><button class="mini" type="button" data-back="1" id="sheetBack" aria-label="Retour">&#8249;</button><div id="sheetStp" style="flex:1"></div><button class="close" id="closeCart" type="button">Fermer</button></div>
+    <h2 id="shTitle">Vos informations</h2>
+    <p class="note" id="shNote">Une seule commande à la fois. Choisir un autre forfait remplace celui-ci.</p>
     <div id="lines"></div>
     <div class="total" hidden><span>Total</span><span id="grand">0 F CFA</span></div>
-    <div>
+    <div id="numBox">
       <label for="num" id="numLabel">Numéro à recharger</label>
       <input id="num" type="tel" inputmode="tel" placeholder="Ex. 07 00 00 00 00" autocomplete="tel">
     </div>
-    <div>
-      <label>Moyen de paiement</label>
-      <div class="pay" id="pay"></div>
-    </div>
+    <div id="payBox" hidden><div class="pay" id="pay"></div></div>
+    <button type="button" class="btn" id="nextBtn">Continuer vers le paiement</button>
     <div class="wavebox" id="waveBox" hidden>
-      <b id="waveTitle" class="wt">Étape 1 : payer avec Wave</b>
+      <b id="waveTitle" class="wt">Payer avec Wave</b>
       <a class="btn wave" id="wavePay" href="#" target="_blank" rel="noopener">Payer avec Wave</a>
       <button type="button" class="btn ok" id="paidBtn" hidden>J'ai effectué le paiement</button>
       <span class="note" id="waveNote"></span>
     </div>
     <p class="err" id="err" hidden></p>
-    <a class="btn" id="send" href="#" target="_blank" rel="noopener" hidden>Étape 2 : envoyer la commande sur WhatsApp</a>
-    <p class="note">Le bouton WhatsApp apparaît après le paiement. Joignez la capture du reçu Wave dans la conversation.</p>
+    <div class="dnbox" id="doneBox" hidden><span class="ok">&#10003;</span><b>Paiement déclaré</b><span class="note">Dernière étape : envoyez votre commande sur WhatsApp.</span></div>
+    <a class="btn" id="send" href="#" target="_blank" rel="noopener" hidden>Envoyer la commande sur WhatsApp</a>
+    <p class="note" id="foot" hidden>Joignez la capture du reçu Wave dans la conversation WhatsApp.</p>
   </div>
 </div>
 
@@ -396,9 +421,45 @@ function homeFx(){
   rv.forEach(function(el){io.observe(el)});
   setTimeout(function(){rv.forEach(function(el){if(!el.classList.contains("in"))show(el)})},4000);
 }
+
+/* ===== Étapes, retour, historique (le bouton retour du téléphone fonctionne aussi) ===== */
+var sheetStep = 1, idx = 0, sheetBase = 0, navOK = true;
+function stepperHTML(labels,cur){
+  return '<ol class="stp" aria-label="Étapes">'+labels.map(function(t,i){
+    var n=i+1, c=n<cur?"done":(n===cur?"cur":"");
+    return '<li class="'+c+'"'+(n===cur?' aria-current="step"':'')+'><span class="d">'+(n<cur?"✓":n)+'</span><span class="t">'+t+'</span></li>';
+  }).join("")+'</ol>';
+}
+function topbarHTML(){
+  var labels,cur;
+  if(screen==="tf"){labels=["Transfert","Paiement"];cur=1}
+  else{labels=["Opérateur","Catégorie","Forfait","Paiement"];cur=screen==="ops"?1:(moovCat?3:2)}
+  return '<div class="tb"><button type="button" class="mini" data-back="1" aria-label="Retour">&#8249;</button>'+stepperHTML(labels,cur)+'</div>';
+}
+function snap(){return {screen:screen,subOp:subOp,moovCat:moovCat,sheet:!$("sheet").hidden,step:sheetStep,i:idx}}
+function pushNav(){try{idx++;history.pushState(snap(),"")}catch(e){idx--;navOK=false}}
+function applySnap(st){
+  screen=st.screen;subOp=st.subOp;moovCat=st.moovCat;sheetStep=st.step||1;
+  renderTabs();renderView();
+  if(st.sheet&&cart.length){renderCart();$("sheet").hidden=false}else{$("sheet").hidden=true}
+  window.scrollTo(0,0);
+}
+function localBack(){
+  if(!$("sheet").hidden){if(sheetStep>1){sheetStep--;renderCart()}else{$("sheet").hidden=true}return}
+  if(screen==="sub"){if(moovCat)moovCat=null;else screen="ops"}
+  else if(screen==="ops"||screen==="tf"){screen="home"}
+  renderTabs();renderView();window.scrollTo(0,0);
+}
+function goBack(){if(navOK&&idx>0){history.back()}else{localBack()}}
+function openSheet(){sheetStep=paid?3:1;renderCart();$("sheet").hidden=false;sheetBase=idx;pushNav()}
+function closeSheet(){
+  if($("sheet").hidden)return;
+  var n=idx-sheetBase;
+  if(navOK&&n>0){history.go(-n)}else{$("sheet").hidden=true}
+}
 function renderView(){
   var h = "";
-  var BACK_HOME = '<button type="button" class="back" data-go="home">← Accueil</button>';
+  var BACK_HOME = "";
   if(screen==="home"){
     h = homeHTML();
   } else if(screen==="ops"){
@@ -418,14 +479,14 @@ function renderView(){
       '<p class="err" id="tfErr" hidden></p>'+
       '<button class="add" type="button" id="tfAdd">Validé</button></div>';
   } else {
-    var back = '<button type="button" class="back" data-go="ops">← Opérateurs</button>';
+    var back = "";
     if(subOp==="moov"||subOp==="mtn"||subOp==="orange"){
       if(!moovCat){
         h = back+'<h2>Pass '+OPNAME[subOp]+'</h2><p class="sub">Choisissez une offre.</p><div class="mgrid">'+
           OFFERS[subOp].map(function(m){return '<button type="button" class="mb '+subOp+'" data-mc="'+m.id+'">'+esc(m.label)+'</button>'}).join("")+'</div>';
       } else {
         var m = OFFERS[subOp].filter(function(x){return x.id===moovCat})[0];
-        var back2 = '<button type="button" class="back" data-mback="1">← Offres '+({orange:"Orange",mtn:"MTN",moov:"Moov"})[subOp]+'</button>';
+        var back2 = "";
         if(m.items.length){
           h = back2+'<h2>'+esc(m.label)+'</h2><p class="sub">Pass '+OPNAME[subOp]+'.</p>'+moovGroups(m.items);
         } else {
@@ -451,6 +512,7 @@ function renderView(){
       }).join("")+'</div>';
     }
   }
+  if(screen!=="home") h = topbarHTML()+h;
   $("view").innerHTML = h;
   if(screen==="home") homeFx();
 }
@@ -473,6 +535,7 @@ function addLine(l,msg){
   orderDate = new Date().toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"});
   updateBar();
   toast(prev && prev.key!==l.key ? "Choix remplacé" : (msg||"Forfait choisi"));
+  openSheet();
 }
 function lineTotal(l){return l.price===null?0:(l.price+(l.fee||0))*l.qty}
 function total(){return cart.reduce(function(s,l){return s+lineTotal(l)},0)}
@@ -522,19 +585,28 @@ function renderInvoice(){
 function renderSteps(){
   var has = cart.length && total()>0;
   var numOk = !orderError();
-  $("waveBox").hidden = !has;
+  if(sheetStep>1 && !numOk) sheetStep=1;
+  if(sheetStep===3 && !paid) sheetStep=2;
+  var st = sheetStep;
+  $("sheetStp").innerHTML = stepperHTML(["Numéro","Paiement","Envoi"], st);
+  $("shTitle").textContent = st===1 ? "Vos informations" : (st===2 ? "Paiement" : "Envoi de la commande");
+  $("shNote").hidden = st!==1;
+  $("numBox").hidden = st!==1;
+  $("nextBtn").hidden = !(st===1 && has);
+  $("nextBtn").classList.toggle("off", !numOk);
+  $("waveBox").hidden = !(has && st===2);
   var wp = $("wavePay");
   wp.classList.toggle("off", !numOk);
   wp.href = numOk ? WAVE_LINK+"?amount="+Math.round(total()) : "#";
   wp.innerHTML = '<img class="wi" src="'+IMG.wave+'" alt=""><span>Payer '+esc(fmt(total()))+' avec Wave</span>';
   $("paidBtn").hidden = !(numOk && payClicked && !paid);
-  $("waveTitle").textContent = paid ? "Paiement déclaré effectué" : "Étape 1 : payer avec Wave";
-  $("waveNote").textContent = !numOk ? "Entrez d'abord votre numéro ci-dessous pour pouvoir payer."
-    : paid ? "Merci. Passez à l'étape 2 pour envoyer la commande."
-    : payClicked ? "Une fois le paiement fait dans Wave, revenez ici et appuyez sur « J'ai effectué le paiement »."
-    : "Le montant à payer est celui de la facture.";
+  $("waveTitle").textContent = paid ? "Paiement déclaré effectué" : "Payer avec Wave";
+  $("waveNote").textContent = payClicked ? "Une fois le paiement fait dans Wave, revenez ici et appuyez sur « J'ai effectué le paiement »."
+    : "Le montant à payer est celui de la facture. Appuyez sur le bouton Wave.";
   $("num").readOnly = paid;
-  $("send").hidden = !(has && paid && numOk);
+  $("doneBox").hidden = !(has && st===3 && paid);
+  $("send").hidden = !(has && st===3 && paid && numOk);
+  $("foot").hidden = st!==3;
 }
 function renderCart(){
   renderInvoice();
@@ -556,10 +628,11 @@ function showErr(id,t){var e=$(id);e.textContent=t;e.hidden=!t}
 
 document.addEventListener("click",function(e){
   var t = e.target.closest("button,a,[data-add]"); if(!t) return;
-  if(t.dataset.mc){moovCat=t.dataset.mc;renderView();window.scrollTo(0,0);return}
+  if(t.dataset.back){goBack();return}
+  if(t.dataset.mc){moovCat=t.dataset.mc;renderView();window.scrollTo(0,0);pushNav();return}
   if(t.dataset.mback){moovCat=null;renderView();return}
-  if(t.dataset.op){moovCat=null;subOp=t.dataset.op;tab="pop";screen="sub";renderTabs();renderView();window.scrollTo(0,0);return}
-  if(t.dataset.go){moovCat=null;screen=t.dataset.go;renderTabs();renderView();window.scrollTo(0,0);return}
+  if(t.dataset.op){moovCat=null;subOp=t.dataset.op;tab="pop";screen="sub";renderTabs();renderView();window.scrollTo(0,0);pushNav();return}
+  if(t.dataset.go){moovCat=null;screen=t.dataset.go;renderTabs();renderView();window.scrollTo(0,0);pushNav();return}
   if(t.dataset.t){tab=t.dataset.t;screen="sub";renderTabs();renderView();return}
   if(t.dataset.add){var p=findItem(t.dataset.add);addLine({key:p.id,name:p.name,op:p.op,note:p.note,cat:curCatLabel(),price:p.price,fee:(p.price===null?0:SUB_FEE),detail:""});return}
   if(t.dataset.o){var _n=$("tfNum").value,_a=$("tfAmt").value;tfOp=t.dataset.o;renderView();$("tfNum").value=_n;$("tfAmt").value=_a;return}
@@ -571,10 +644,11 @@ document.addEventListener("click",function(e){
     addLine({key:"tf-"+tfOp+"-"+n+"-"+a,name:"Transfert d'unité vers "+OPNAME[tfOp],detail:n+" · ",kind:"tf",op:tfOp,dest:n,price:a,fee:Math.ceil(a*TRANSFER_RATE)},"Transfert validé");
     $("tfAmt").value="";return}
   if(t.id==="wavePay"){ if(orderError()){e.preventDefault();return} payClicked=true; setTimeout(renderSteps,0); return }
-  if(t.id==="paidBtn"){ paid=true; renderInvoice(); renderSteps(); buildLink(); return }
-  if(t.id==="openCart"){renderCart();$("sheet").hidden=false;return}
-  if(t.id==="closeCart"){$("sheet").hidden=true;return}
-  if(t.dataset.rm){cart.splice(+t.dataset.rm,1);payClicked=false;paid=false;updateBar();renderCart();return}
+  if(t.id==="paidBtn"){ paid=true; sheetStep=3; pushNav(); renderCart(); return }
+  if(t.id==="nextBtn"){ var ne=orderError(); if(ne){showErr("err",ne);$("num").focus();return} showErr("err",""); sheetStep=2; pushNav(); renderCart(); return }
+  if(t.id==="openCart"){openSheet();return}
+  if(t.id==="closeCart"){closeSheet();return}
+  if(t.dataset.rm){cart.splice(+t.dataset.rm,1);payClicked=false;paid=false;sheetStep=1;updateBar();renderCart();closeSheet();toast("Commande retirée");return}
   if(t.dataset.q){var i=+t.dataset.i;cart[i].qty+=+t.dataset.q;if(cart[i].qty<1)cart.splice(i,1);updateBar();renderCart();return}
   if(t.dataset.p){payChoice=t.dataset.p;renderCart();return}
   if(t.id==="send"){
@@ -583,15 +657,24 @@ document.addEventListener("click",function(e){
     showErr("err","");
   }
 });
-$("sheet").addEventListener("click",function(e){if(e.target===this)this.hidden=true});
+$("sheet").addEventListener("click",function(e){if(e.target===this)closeSheet()});
 $("num").addEventListener("input",function(){renderInvoice();renderSteps();buildLink()});
 document.addEventListener("keydown",function(e){
-  if(e.key==="Escape")$("sheet").hidden=true;
+  if(e.key==="Escape")closeSheet();
   if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches(".card.tap")){e.preventDefault();e.target.click()}
 });
 
 $("phoneShown").textContent = PHONE_SHOWN;
 renderTabs();renderView();updateBar();
+try{history.replaceState(snap(),"")}catch(e){navOK=false}
+window.addEventListener("popstate",function(e){
+  var st=e.state;
+  if(!st){st={screen:"home",subOp:subOp,moovCat:null,sheet:false,step:1,i:0};idx=0}else{idx=st.i||0}
+  applySnap(st);
+});
+document.addEventListener("keydown",function(e){
+  if(e.key==="Enter"&&e.target&&e.target.id==="num"){e.preventDefault();var nb=$("nextBtn");if(!nb.hidden&&!nb.classList.contains("off"))nb.click()}
+});
 
 /* ===== PWA : service worker + installation ===== */
 (function(){
