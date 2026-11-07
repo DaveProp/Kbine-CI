@@ -143,6 +143,73 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
 .install b{font-family:var(--font-display)}
 .install .row{display:flex;gap:8px}
 .install .no{border:0;background:none;color:var(--muted);font:inherit;cursor:pointer;padding:8px}
+
+/* ===== Accueil animé ===== */
+.hx{display:grid;gap:18px;margin-top:4px}
+.hx-hero{position:relative;overflow:hidden;border-radius:24px;padding:26px 20px 22px;color:#fff;isolation:isolate;
+  background:linear-gradient(120deg,#0b4f22,#1d8a3c 45%,#f07d00 120%);background-size:220% 220%;animation:hxShift 12s ease-in-out infinite;
+  box-shadow:0 18px 40px -18px rgba(29,138,60,.65)}
+.hx-hero::before,.hx-hero::after{content:"";position:absolute;border-radius:50%;filter:blur(38px);z-index:-1;opacity:.55}
+.hx-hero::before{width:220px;height:220px;background:#ffb84d;top:-70px;right:-60px;animation:hxDrift 9s ease-in-out infinite}
+.hx-hero::after{width:200px;height:200px;background:#35d06a;bottom:-80px;left:-60px;animation:hxDrift 11s ease-in-out infinite reverse}
+.hx-chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);padding:6px 12px;border-radius:999px;font-weight:700;font-size:.8rem;backdrop-filter:blur(4px)}
+.hx-dot{width:9px;height:9px;border-radius:50%;background:#7dff9f;box-shadow:0 0 0 0 rgba(125,255,159,.8);animation:hxPulse 1.8s infinite}
+.hx-title{font-family:var(--font-display);font-weight:800;font-size:clamp(1.9rem,7.5vw,2.7rem);line-height:1.04;letter-spacing:-.02em;margin:14px 0 8px}
+.hx-title .g{display:inline-block;background:linear-gradient(90deg,#fff,#ffe2a8,#fff);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:hxText 4s linear infinite}
+.hx-lead{margin:0 0 16px;font-size:1rem;opacity:.95;max-width:34ch}
+.hx-orbs{display:flex;gap:12px;align-items:center;margin-top:6px}
+.hx-orb{width:58px;height:58px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 10px 22px -8px rgba(0,0,0,.45);animation:hxFloat 3.4s ease-in-out infinite}
+.hx-orb:nth-child(2){animation-delay:-1.1s}.hx-orb:nth-child(3){animation-delay:-2.2s}
+.hx-orb img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.hx-wave{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;background:rgba(0,0,0,.22);padding:8px 12px;border-radius:12px}
+.hx-wave img{width:26px;height:26px;border-radius:6px;background:#fff;padding:2px}
+.hx-cta{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.hx-btn{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;text-align:left;border:0;border-radius:20px;padding:18px;font:inherit;cursor:pointer;min-width:0;width:100%;transition:transform .15s}
+.hx-btn:active{transform:scale(.98)}
+.hx-btn img{width:62px;height:62px;border-radius:16px;flex:none;background:#fff;padding:3px}
+.hx-btn b{display:block;font-family:var(--font-display);font-size:1.28rem;line-height:1.1}
+.hx-btn span.t{display:block;font-size:.86rem;margin-top:4px;opacity:.9}
+.hx-btn .arrow{margin-left:auto;flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:1.2rem;font-weight:800;transition:transform .2s}
+.hx-btn:hover .arrow{transform:translateX(4px)}
+.hx-btn.a{background:linear-gradient(135deg,#f07d00,#ff9f2e);color:#1b1100;animation:hxGlow 2.4s ease-in-out infinite}
+.hx-btn.a .arrow{background:rgba(0,0,0,.16)}
+.hx-btn.b{background:linear-gradient(135deg,#1d8a3c,#3fbf62);color:#fff}
+.hx-btn.b .arrow{background:rgba(255,255,255,.25)}
+.hx-btn::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);animation:hxShine 3.6s ease-in-out infinite}
+.hx-btn.b::after{animation-delay:1.6s}
+.hx-mq{overflow:hidden;border-radius:14px;background:var(--surface);border:1px solid var(--line);padding:10px 0;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.hx-track{display:flex;gap:10px;width:max-content;animation:hxMarq 26s linear infinite}
+.hx-mq:hover .hx-track{animation-play-state:paused}
+.hx-tag{flex:none;padding:7px 14px;border-radius:999px;background:var(--green-soft);color:var(--fg);font-weight:700;font-size:.85rem;white-space:nowrap}
+.hx-tag:nth-child(3n){background:var(--orange-soft)}
+.hx-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.hx-st{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 8px;text-align:center}
+.hx-st b{display:block;font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--green);line-height:1}
+.hx-st:nth-child(2) b{color:var(--orange)}
+.hx-st span{display:block;margin-top:6px;font-size:.78rem;color:var(--muted)}
+.hx-h{font-family:var(--font-display);font-size:1.2rem;margin:6px 0 0}
+.hx-steps{display:grid;gap:10px}
+.hx-step{display:flex;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.hx-n{flex:none;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-family:var(--font-display);font-weight:800;font-size:1.15rem;color:#fff;background:linear-gradient(135deg,#1d8a3c,#f07d00)}
+.hx-step b{display:block;font-family:var(--font-display)}
+.hx-step span{color:var(--muted);font-size:.86rem}
+.hx-help{display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;border-radius:16px;padding:14px;font-weight:800;color:#06220f;background:#25d366;animation:hxGlow2 2.8s ease-in-out infinite}
+.hx-rv{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.hx-rv.in{opacity:1;transform:none}
+.hx-rv:nth-child(2){transition-delay:.08s}.hx-rv:nth-child(3){transition-delay:.16s}
+@keyframes hxShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes hxDrift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-30px,26px) scale(1.15)}}
+@keyframes hxPulse{70%{box-shadow:0 0 0 10px rgba(125,255,159,0)}100%{box-shadow:0 0 0 0 rgba(125,255,159,0)}}
+@keyframes hxText{to{background-position:-200% 0}}
+@keyframes hxFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes hxShine{0%{left:-60%}55%,100%{left:130%}}
+@keyframes hxMarq{to{transform:translateX(-50%)}}
+@keyframes hxGlow{0%,100%{box-shadow:0 10px 24px -12px rgba(240,125,0,.9)}50%{box-shadow:0 14px 34px -8px rgba(240,125,0,1)}}
+@keyframes hxGlow2{0%,100%{box-shadow:0 8px 20px -12px rgba(37,211,102,.9)}50%{box-shadow:0 12px 30px -8px rgba(37,211,102,1)}}
+@media (prefers-reduced-motion:reduce){
+  .hx-hero,.hx-hero::before,.hx-hero::after,.hx-title .g,.hx-orb,.hx-btn,.hx-btn::after,.hx-track,.hx-dot,.hx-help{animation:none!important}
+  .hx-rv{opacity:1;transform:none;transition:none}
+}
 </style>
 
 <div class="wrap">
@@ -277,13 +344,63 @@ function renderTabs(){
     return '<button type="button" role="tab" aria-selected="'+(c.id===tab)+'" data-t="'+c.id+'"><img src="'+IMG[c.icon]+'" alt="">'+esc(c.label)+'</button>';
   }).join("");
 }
+
+function homeHTML(){
+  var tags=["Pass internet","Pass appels","Pass Mix","Internet illimité","Transfert d’unité","Pass Fibre","Pass International","Bons Plans","Moov Folie","MTN C’CHIC","Pass Max it","Pass Social"];
+  var tg=tags.concat(tags).map(function(t){return '<span class="hx-tag">'+t+'</span>'}).join("");
+  return '<div class="hx">'+
+   '<section class="hx-hero">'+
+     '<span class="hx-chip"><i class="hx-dot"></i>Ouvert 24h/24, 7j/7</span>'+
+     '<h2 class="hx-title">Vos pass et unités,<br><span class="g">en un clin d’œil</span></h2>'+
+     '<p class="hx-lead">Orange, MTN et Moov. Choisissez, payez avec Wave, c’est livré.</p>'+
+     '<div class="hx-orbs"><span class="hx-orb"><img src="'+IMG.orange+'" alt="Orange"></span><span class="hx-orb"><img src="'+IMG.mtn+'" alt="MTN"></span><span class="hx-orb"><img src="'+IMG.moov+'" alt="Moov"></span>'+
+     '<span class="hx-wave"><img src="'+IMG.wave+'" alt="">Paiement Wave</span></div>'+
+   '</section>'+
+   '<div class="hx-cta">'+
+     '<button type="button" class="hx-btn a" data-go="tf"><img src="'+IMG.transfert+'" alt=""><div><b>Transfert d’unité</b><span class="t">Envoyez des unités sur Orange, MTN ou Moov</span></div><span class="arrow">›</span></button>'+
+     '<button type="button" class="hx-btn b" data-go="ops"><img src="'+IMG.internet+'" alt=""><div><b>Souscription</b><span class="t">Pass internet et pass appels</span></div><span class="arrow">›</span></button>'+
+   '</div>'+
+   '<div class="hx-mq" aria-hidden="true"><div class="hx-track">'+tg+'</div></div>'+
+   '<div class="hx-stats">'+
+     '<div class="hx-st hx-rv"><b data-count="3">0</b><span>réseaux</span></div>'+
+     '<div class="hx-st hx-rv"><b data-count="'+passCount()+'" data-plus="1">0</b><span>pass disponibles</span></div>'+
+     '<div class="hx-st hx-rv"><b>24h/24</b><span>service en ligne</span></div>'+
+   '</div>'+
+   '<h3 class="hx-h">Comment ça marche ?</h3>'+
+   '<div class="hx-steps">'+
+     '<div class="hx-step hx-rv"><span class="hx-n">1</span><div><b>Choisissez</b><span>Un pass ou un transfert d’unité, et votre numéro.</span></div></div>'+
+     '<div class="hx-step hx-rv"><span class="hx-n">2</span><div><b>Payez avec Wave</b><span>Le montant est déjà rempli, un seul clic.</span></div></div>'+
+     '<div class="hx-step hx-rv"><span class="hx-n">3</span><div><b>Envoyez sur WhatsApp</b><span>Joignez le reçu, vous recevez votre forfait.</span></div></div>'+
+   '</div>'+
+   '<a class="hx-help" href="https://wa.me/'+PHONE_INTL+'?text='+encodeURIComponent("Bonjour K-Bine CI, j’ai une question.")+'" target="_blank" rel="noopener">Une question ? Écrivez-nous sur WhatsApp</a>'+
+  '</div>';
+}
+function passCount(){
+  var n=0;[ORANGE_CATS,MOOV_CATS,MTN_CATS].forEach(function(cs){cs.forEach(function(c){c.items.forEach(function(i){if(i.price!==null)n++})})});
+  return n;
+}
+function homeFx(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var rv=document.querySelectorAll("#view .hx-rv");
+  function count(el){
+    var to=+el.dataset.count, plus=el.dataset.plus?"+":"";
+    if(reduce){el.textContent=to+plus;return}
+    var t0=null,dur=1400;
+    function step(t){if(!t0)t0=t;var k=Math.min((t-t0)/dur,1),e=1-Math.pow(1-k,3);el.textContent=Math.round(to*e)+(k===1?plus:"");if(k<1)requestAnimationFrame(step)}
+    requestAnimationFrame(step);
+    setTimeout(function(){el.textContent=to+plus},dur+400);
+  }
+  function show(el){el.classList.add("in");var c=el.querySelector("[data-count]");if(c&&!c.dataset.done){c.dataset.done="1";count(c)}}
+  if(!("IntersectionObserver" in window)||reduce){rv.forEach(show);return}
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){show(e.target);io.unobserve(e.target)}})},{threshold:.15});
+  rv.forEach(function(el){io.observe(el)});
+  setTimeout(function(){rv.forEach(function(el){if(!el.classList.contains("in"))show(el)})},4000);
+}
 function renderView(){
   var h = "";
   var BACK_HOME = '<button type="button" class="back" data-go="home">← Accueil</button>';
   if(screen==="home"){
-    h = '<p class="ask">Que souhaitez-vous faire ?</p><div class="home">'+
-      '<button type="button" class="big tf" data-go="tf"><img src="'+IMG.transfert+'" alt=""><div><b>Transfert d\'unité</b><span>Envoyer des unités sur Orange, MTN ou Moov</span></div></button>'+
-      '<button type="button" class="big sub" data-go="ops"><img src="'+IMG.internet+'" alt=""><div><b>Souscription</b><span>Pass internet et pass appels</span></div></button></div>';
+    h = homeHTML();
   } else if(screen==="ops"){
     h = BACK_HOME+'<h2>Souscription</h2><p class="sub">Choisissez votre opérateur.</p><div class="opsrow">'+
       ["orange","mtn","moov"].map(function(o){
@@ -335,6 +452,7 @@ function renderView(){
     }
   }
   $("view").innerHTML = h;
+  if(screen==="home") homeFx();
 }
 function findItem(id){
   var all=ORANGE_CATS.concat(MOOV_CATS,MTN_CATS);for(var k=0;k<all.length;k++){var mi=all[k].items;for(var q=0;q<mi.length;q++)if(mi[q].id===id)return mi[q]}
