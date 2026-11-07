@@ -1,6 +1,6 @@
 /* K-Bine CI : service worker. Change VERSION pour forcer la mise à jour. */
-var VERSION = "kbine-v1";
-var SHELL = ["./","index.html","manifest.webmanifest","icons/icon-192.png","icons/icon-512.png","icons/icon-maskable-512.png","icons/apple-touch-icon.png","icons/favicon-32.png"];
+var VERSION = "kbine-v2";
+var SHELL = ["./","index.html","manifest.webmanifest","icon-192.png","icon-512.png","icon-maskable-512.png","apple-touch-icon.png","favicon-32.png"];
 
 self.addEventListener("install", function(e){
   e.waitUntil(caches.open(VERSION).then(function(c){return c.addAll(SHELL)}).then(function(){return self.skipWaiting()}));
