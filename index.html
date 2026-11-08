@@ -311,6 +311,8 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
     <div id="numBox">
       <label for="num" id="numLabel">Numéro à recharger</label>
       <input id="num" type="tel" inputmode="tel" placeholder="Ex. 07 00 00 00 00" autocomplete="tel">
+      <label for="email" style="margin-top:10px">Email (facultatif)</label>
+      <input id="email" type="email" inputmode="email" placeholder="vous@exemple.com" autocomplete="email">
     </div>
     <div id="payBox" hidden><div class="pay" id="pay"></div></div>
     <button type="button" class="btn" id="nextBtn">Continuer vers le paiement</button>
@@ -329,12 +331,13 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
       <span class="note" id="waveNote"></span>
     </div>
     <p class="err" id="err" hidden></p>
-    <div class="dnbox" id="doneBox" hidden><span class="ok">&#10003;</span><b>Paiement déclaré</b><span class="note">Dernière étape : envoyez votre commande sur WhatsApp, puis joignez la capture d'écran de votre paiement (trombone, puis Galerie). Votre forfait est livré dès que votre paiement est vérifié.</span></div>
+    <div class="dnbox" id="doneBox" hidden><span class="ok">&#10003;</span><b>Paiement déclaré</b><span class="note">Dernière étape : envoyez votre commande sur WhatsApp, puis joignez la capture d'écran de votre paiement (trombone, puis Galerie). Votre forfait est livré dès que votre paiement est vérifié.</span><span class="note" id="saveNote"></span></div>
     <a class="btn" id="send" href="#" target="_blank" rel="noopener" hidden>Envoyer la commande sur WhatsApp</a>
     <p class="note" id="foot" hidden>Joignez la capture du reçu Wave dans la conversation WhatsApp.</p>
   </div>
 </div>
 
+<script src="config.js"></script>
 <script>
 /* ===== Données : modifiez ici les prix et contenus ===== */
 var PHONE_INTL = "2250717521322";
@@ -370,7 +373,57 @@ function checkNum(v,op){
 function orderError(){
   if(!cart.length) return "Choisissez d'abord un forfait.";
   var l = cart[0];
+  var em = $("email").value.trim();
+  if(em && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) return "Cet email ne semble pas valide (ou laissez le champ vide).";
   return checkNum($("num").value, l.kind==="tf" ? null : l.op);
+}
+
+/* ===== Base de données (Supabase) : enregistrement des commandes + prix modifiables depuis l'admin ===== */
+var DB = (function(){var c=window.KB_CONFIG;return (c&&c.url&&c.key&&!/VOTRE-/.test(c.url))?c:null})();
+var orderSaved = false;
+function dbFetch(path,opt){
+  opt = opt||{}; opt.headers = Object.assign({apikey:DB.key,Authorization:"Bearer "+DB.key},opt.headers||{});
+  return fetch(DB.url+path,opt).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r});
+}
+function loadRemote(){
+  if(!DB) return;
+  Promise.all([
+    dbFetch("/rest/v1/settings?select=key,value").then(function(r){return r.json()}),
+    dbFetch("/rest/v1/price_overrides?select=item_id,price,active").then(function(r){return r.json()})
+  ]).then(function(res){
+    res[0].forEach(function(s){
+      var v=parseFloat(s.value); if(isNaN(v)) return;
+      if(s.key==="sub_fee") SUB_FEE=v; else if(s.key==="transfer_rate") TRANSFER_RATE=v; else if(s.key==="transfer_min") TRANSFER_MIN=v;
+    });
+    var ov={}; res[1].forEach(function(o){ov[o.item_id]=o});
+    ["orange","mtn","moov"].forEach(function(op){
+      OFFERS[op].forEach(function(c){
+        c.items.forEach(function(it){var o=ov[it.id];if(o&&o.price!==null&&o.price!==undefined)it.price=o.price});
+        for(var i=c.items.length-1;i>=0;i--){var o2=ov[c.items[i].id];if(o2&&o2.active===false)c.items.splice(i,1)}
+      });
+      for(var j=OFFERS[op].length-1;j>=0;j--){if(!OFFERS[op][j].items.length)OFFERS[op].splice(j,1)}
+    });
+    if(!cart.length && $("sheet").hidden) renderView();
+  }).catch(function(){});
+}
+function saveOrder(){
+  var l = cart[0];
+  if(!DB || !l || orderSaved) return Promise.resolve(false);
+  orderSaved = true;
+  var ext = ({"image/png":"png","image/webp":"webp","image/gif":"gif","image/heic":"heic"})[shot.type]||"jpg";
+  var path = orderRef+"/"+Math.random().toString(36).slice(2,10)+"."+ext;
+  var tf = l.kind==="tf";
+  var row = {
+    ref:orderRef, kind:tf?"tf":"sub", operator:l.op, category:l.cat||null, item_id:tf?null:l.key,
+    item_name:l.name, note:l.note||null, phone:cleanNum($("num").value), dest_phone:tf?cleanNum(l.dest):null,
+    email:$("email").value.trim()||null, amount:l.price===null?0:l.price, fee:l.fee||0, total:total(),
+    receipt_path:path, status:"paid_declared"
+  };
+  return dbFetch("/storage/v1/object/receipts/"+path,{method:"POST",headers:{"Content-Type":shot.type||"image/jpeg"},body:shot})
+    .catch(function(){row.receipt_path=null})
+    .then(function(){return dbFetch("/rest/v1/orders",{method:"POST",headers:{"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(row)})})
+    .then(function(){return true})
+    .catch(function(){orderSaved=false;return false});
 }
 
 var SHOT_MAX = 10*1024*1024;
@@ -537,7 +590,7 @@ function renderView(){
       '</div></div>'+
       '<div><label for="tfNum">Numéro du bénéficiaire ('+OPNAME[tfOp]+' : commence par '+PREFIX[tfOp]+')</label><input id="tfNum" type="tel" inputmode="tel" placeholder="'+PREFIX[tfOp]+' 00 00 00 00"></div>'+
       '<div><label for="tfAmt">Montant à transférer (F CFA)</label><input id="tfAmt" type="number" inputmode="numeric" min="300" step="50" placeholder="Ex. 1000 (minimum 300)"></div>'+
-      '<p class="note">Montant minimum : '+fmt(TRANSFER_MIN)+'. Frais de service : 10 % du montant transféré.</p>'+
+      '<p class="note">Montant minimum : '+fmt(TRANSFER_MIN)+'. Frais de service : '+Math.round(TRANSFER_RATE*100)+' % du montant transféré.</p>'+
       '<p class="err" id="tfErr" hidden></p>'+
       '<button class="add" type="button" id="tfAdd">Validé</button></div>';
   } else {
@@ -596,7 +649,7 @@ function curCatLabel(){
 }
 function addLine(l,msg){
   var prev = cart[0];
-  l.qty = 1; cart = [l]; payClicked = false; paid = false; resetShot();
+  l.qty = 1; cart = [l]; payClicked = false; paid = false; orderSaved = false; resetShot();
   orderRef = newRef();
   orderDate = new Date().toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"});
   updateBar();
@@ -620,7 +673,7 @@ function invoiceRows(){
     r.push(["Réseau du bénéficiaire",OPNAME[l.op]]);
     r.push(["Numéro du bénéficiaire",l.dest]);
     r.push(["Montant transféré",fmt(l.price)]);
-    r.push(["Frais de service (10 %)",fmt(l.fee)]);
+    r.push(["Frais de service ("+Math.round(TRANSFER_RATE*100)+" %)",fmt(l.fee)]);
     r.push(["Numéro de l'expéditeur",num||"à renseigner"]);
   } else {
     r.push(["Type de service","Souscription"]);
@@ -676,7 +729,7 @@ function renderSteps(){
   $("waveTitle").textContent = paid ? "Paiement déclaré effectué" : "Payer avec Wave";
   $("waveNote").textContent = payClicked ? "Une fois le paiement fait dans Wave, revenez ici, ajoutez la capture d'écran de votre reçu, puis appuyez sur « J'ai effectué le paiement »."
     : "Le montant à payer est celui de la facture. Appuyez sur le bouton Wave.";
-  $("num").readOnly = paid;
+  $("num").readOnly = paid; $("email").readOnly = paid;
   $("doneBox").hidden = !(has && st===3 && paid);
   $("send").hidden = !(has && st===3 && paid && numOk && shotOk);
   $("foot").hidden = st!==3;
@@ -717,11 +770,14 @@ document.addEventListener("click",function(e){
     addLine({key:"tf-"+tfOp+"-"+n+"-"+a,name:"Transfert d'unité vers "+OPNAME[tfOp],detail:n+" · ",kind:"tf",op:tfOp,dest:n,price:a,fee:Math.ceil(a*TRANSFER_RATE)},"Transfert validé");
     $("tfAmt").value="";return}
   if(t.id==="wavePay"){ if(orderError()){e.preventDefault();return} payClicked=true; setTimeout(renderSteps,0); return }
-  if(t.id==="paidBtn"){ if(!shotValid()){showErr("txErr",shotError()||"Ajoutez la capture d'écran de votre paiement Wave.");return} paid=true; sheetStep=3; pushNav(); renderCart(); return }
+  if(t.id==="paidBtn"){ if(!shotValid()){showErr("txErr",shotError()||"Ajoutez la capture d'écran de votre paiement Wave.");return} paid=true; sheetStep=3; pushNav(); renderCart();
+    $("saveNote").textContent="";
+    saveOrder().then(function(ok){ if(DB) $("saveNote").textContent = ok ? "Commande enregistrée." : "Enregistrement en ligne impossible : envoyez bien la commande sur WhatsApp." });
+    return }
   if(t.id==="nextBtn"){ var ne=orderError(); if(ne){showErr("err",ne);$("num").focus();return} showErr("err",""); sheetStep=2; pushNav(); renderCart(); return }
   if(t.id==="openCart"){openSheet();return}
   if(t.id==="closeCart"){closeSheet();return}
-  if(t.dataset.rm){cart.splice(+t.dataset.rm,1);payClicked=false;paid=false;resetShot();sheetStep=1;updateBar();renderCart();closeSheet();toast("Commande retirée");return}
+  if(t.dataset.rm){cart.splice(+t.dataset.rm,1);payClicked=false;paid=false;orderSaved=false;resetShot();sheetStep=1;updateBar();renderCart();closeSheet();toast("Commande retirée");return}
   if(t.dataset.q){var i=+t.dataset.i;cart[i].qty+=+t.dataset.q;if(cart[i].qty<1)cart.splice(i,1);updateBar();renderCart();return}
   if(t.dataset.p){payChoice=t.dataset.p;renderCart();return}
   if(t.id==="send"){
@@ -732,6 +788,7 @@ document.addEventListener("click",function(e){
 });
 $("sheet").addEventListener("click",function(e){if(e.target===this)closeSheet()});
 $("num").addEventListener("input",function(){renderInvoice();renderSteps();buildLink()});
+$("email").addEventListener("input",function(){renderSteps();buildLink()});
 $("fabShare").addEventListener("click",function(){
   var url = location.href.split("#")[0];
   var text = "K-Bine CI : pass internet, pass appels et transfert d’unité Orange, MTN et Moov. Paiement avec Wave.";
@@ -758,7 +815,7 @@ document.addEventListener("keydown",function(e){
 });
 
 $("phoneShown").textContent = PHONE_SHOWN;
-renderTabs();renderView();updateBar();
+renderTabs();renderView();updateBar();loadRemote();
 try{history.replaceState(snap(),"")}catch(e){navOK=false}
 window.addEventListener("popstate",function(e){
   var st=e.state;
