@@ -151,7 +151,7 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
 .mo-top .m b{overflow-wrap:anywhere}.mo-top .m span{color:var(--muted);font-size:.78rem}
 .mo-tot{font-family:var(--font-display);font-weight:800;font-size:1.05rem;white-space:nowrap}
 .mo-b{display:inline-block;padding:3px 12px;border-radius:999px;font-weight:800;font-size:.78rem;justify-self:start}
-.mo-b.s1{background:var(--orange-soft);color:#9a5200}.mo-b.s2,.mo-b.s3{background:var(--green-soft);color:#146b2e}.mo-b.sx{background:#fbe9e7;color:var(--danger)}
+.mo-b.s1{background:var(--orange-soft);color:#9a5200}.mo-b.s2{background:#e3eefb;color:#1b5fa8}.mo-b.s3{background:var(--green-soft);color:#146b2e}.mo-b.sx{background:#fbe9e7;color:var(--danger)}
 .mo-d{margin:0;color:var(--muted);font-size:.86rem}
 .mo-can{background:#fbe9e7;color:var(--danger);border-radius:10px;padding:8px 12px;font-weight:700;font-size:.86rem}
 .mo-warn{background:var(--orange-soft);color:#7a4300;border-radius:10px;padding:8px 12px;font-size:.82rem}
@@ -377,6 +377,8 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
     </div>
     <p class="err" id="err" hidden></p>
     <div class="dnbox" id="doneBox" hidden><span class="ok">&#10003;</span><b>Paiement déclaré</b><span class="note" id="doneNote"></span><span class="note" id="saveNote"></span></div>
+    <button type="button" class="btn ok" id="shareBtn" hidden>Envoyer la capture + la facture (image) sur WhatsApp</button>
+    <p class="note" id="shareNote" hidden></p>
     <a class="btn ok" id="send" href="#" target="_blank" rel="noopener" hidden>Envoyer la facture à K-Bine CI sur WhatsApp</a>
     <button type="button" class="btn alt" id="trackBtn" hidden>Suivre ma commande</button>
     <p class="note" id="foot" hidden>Joignez la capture du reçu Wave dans la conversation WhatsApp.</p>
@@ -521,7 +523,9 @@ function shotError(file){
   if(f.size>SHOT_MAX) return "Image trop lourde (10 Mo maximum).";
   return "";
 }
+var shareFiles = null;
 function resetShot(){
+  shareFiles = null;
   if(shotUrl){try{URL.revokeObjectURL(shotUrl)}catch(e){}}
   shotUrl = ""; shot = null;
   var i=$("shot"); if(i) i.value="";
@@ -829,6 +833,9 @@ function renderSteps(){
   $("doneBox").hidden = !(has && st===3 && paid);
   var ready = has && st===3 && paid && numOk && shotOk;
   $("send").hidden = !ready;
+  var shOk = ready && !!shareFiles;
+  $("shareBtn").hidden = !shOk; $("shareNote").hidden = !shOk;
+  $("shareNote").textContent = "Appuyez sur le bouton vert, choisissez WhatsApp, puis le contact K-Bine CI ("+PHONE_SHOWN+") : la capture de votre paiement et la facture partent ensemble. Sinon, utilisez le lien ci-dessous.";
   $("doneNote").textContent = "Dernière étape : 1) appuyez sur « Envoyer la facture à K-Bine CI sur WhatsApp » : WhatsApp s'ouvre directement sur le numéro K-Bine CI ("+PHONE_SHOWN+"), puis appuyez sur Envoyer. 2) Dans la conversation, appuyez sur le trombone (ou +), puis Galerie, et choisissez la capture de votre paiement. Votre forfait est livré dès que votre paiement est vérifié.";
   $("foot").textContent = "Après la facture, joignez la capture du reçu Wave dans la conversation WhatsApp (trombone, puis Galerie).";
   $("trackBtn").hidden = !(has && st===3 && paid);
@@ -853,14 +860,16 @@ function buildLink(){
 /* ===== Mes commandes : suivi de l'état des commandes ===== */
 var MO_KEY="kb_orders", moBusy=false, moMsg="", moGoFlag=false;
 var MO_STAGES=[
-  {t:"Commande reçue",d:"Votre paiement est déclaré. K-Bine CI le vérifie, puis livre votre forfait."},
+  {t:"Commande reçue",d:"Votre paiement est déclaré. K-Bine CI est en train de le vérifier."},
+  {t:"Paiement vérifié",d:"Votre paiement est confirmé. Votre forfait est en cours de livraison."},
   {t:"Forfait livré",d:"Votre forfait a été livré. Merci pour votre confiance."}];
 function moLoad(){try{var a=JSON.parse(localStorage.getItem(MO_KEY)||"[]");return Array.isArray(a)?a:[]}catch(e){return []}}
 function moSave(a){try{a.sort(function(x,y){return String(y.date).localeCompare(String(x.date))});localStorage.setItem(MO_KEY,JSON.stringify(a.slice(0,50)))}catch(e){}}
 function moStage(st){
   var x=String(st||"").toLowerCase();
   if(/reject|refus|cancel|annul|fail|[eé]chou/.test(x)) return -1;
-  if(/deliver|livr|complet|termin|done/.test(x)) return 2;
+  if(/deliver|livr|complet|termin|done/.test(x)) return 3;
+  if(/verif|v[ée]rifi|confirm|valid/.test(x)) return 2;
   return 1;
 }
 function moRemember(){
@@ -886,9 +895,9 @@ function moCard(o){
   var wa="https://wa.me/"+PHONE_INTL+"?text="+encodeURIComponent("Bonjour K-Bine CI, où en est ma commande "+o.ref+" ("+o.item+") ?");
   return '<article class="mo-card"><div class="mo-top">'+(IMG[o.op]?'<img src="'+IMG[o.op]+'" alt="">':'')+
     '<div class="m"><b>'+esc(o.item||"Commande")+'</b><span>Réf. '+esc(o.ref)+' · '+esc(moDate(o.date))+'</span></div><span class="mo-tot">'+esc(fmt(o.total||0))+'</span></div>'+
-    '<span class="mo-b '+(cx?"sx":"s"+st)+'">'+(cx?"Refusée":(st===1?"En cours de traitement":"Livrée"))+'</span>'+
+    '<span class="mo-b '+(cx?"sx":"s"+st)+'">'+(cx?"Refusée":(st===1?"Reçue, en vérification":(st===2?"Paiement vérifié":"Livrée")))+'</span>'+
     (cx?'<div class="mo-can">Cette commande a été refusée (paiement non confirmé ou erreur sur le numéro). Contactez-nous sur WhatsApp, nous allons vous aider.</div>'
-       :stepperHTML(["Reçue","Livrée"],st===2?3:st)+'<p class="mo-d">'+esc(MO_STAGES[st-1].d)+'</p>')+
+       :stepperHTML(["Reçue","Vérifié","Livrée"],st===3?4:st)+'<p class="mo-d">'+esc(MO_STAGES[st-1].d)+'</p>')+
     (o.synced===false&&DB?'<div class="mo-warn">Cette commande n’a pas pu être enregistrée en ligne : envoyez-la bien sur WhatsApp pour qu’elle soit traitée.</div>':'')+
     '<div class="mo-acts"><button type="button" class="qbtn" data-moinv="'+esc(o.ref)+'">Télécharger ma facture</button>'+
     '<a class="mo-wa" href="'+esc(wa)+'" target="_blank" rel="noopener">Une question ? WhatsApp</a></div></article>';
@@ -951,7 +960,7 @@ function moSections(o){
   if(o.note) od.push(["Contenu et durée",o.note]);
   var am=[];
   if(o.price!=null&&o.price!==undefined&&!isNaN(o.price)){am.push([tf?"Montant transféré":"Prix du forfait",fmt(o.price)]);am.push(["Frais de service",fmt(o.fee||0)])}
-  var py=[["Mode de paiement","Wave"],["Statut",cx<0?"Refusée":(cx===2?"Livrée":"Payé (déclaré), en traitement")]];
+  var py=[["Mode de paiement","Wave"],["Statut",cx<0?"Refusée":(cx===3?"Livrée":(cx===2?"Paiement vérifié, livraison en cours":"Payé (déclaré), en traitement"))]];
   var out=[{title:"Client",rows:cl},{title:"Détails de la commande",rows:od}];
   if(am.length) out.push({title:"Montant",rows:am});
   out.push({title:"Paiement",rows:py}); return out;
@@ -1093,7 +1102,7 @@ document.addEventListener("click",function(e){
       paid=true; sheetStep=3; pushNav(); renderCart();
       $("saveNote").textContent="";
       uploadErr = "";
-      moRemember(); var moRef = orderRef;
+      moRemember(); var moRef = orderRef; prepShare(moRef);
       saveOrder().then(function(ok){ if(ok) moMark(moRef); if(DB) $("saveNote").textContent = (ok ? (uploadErr ? "Commande enregistrée, mais capture non envoyée : " : "Commande enregistrée.") : "Enregistrement en ligne impossible : envoyez bien la commande sur WhatsApp. ") + (uploadErr && (!ok || true) ? " ["+uploadErr+"]" : "") });
     });
     return }
@@ -1103,6 +1112,12 @@ document.addEventListener("click",function(e){
   if(t.dataset.rm){cart.splice(+t.dataset.rm,1);payClicked=false;paid=false;orderSaved=false;resetShot();sheetStep=1;updateBar();renderCart();closeSheet();toast("Commande retirée");return}
   if(t.dataset.q){var i=+t.dataset.i;cart[i].qty+=+t.dataset.q;if(cart[i].qty<1)cart.splice(i,1);updateBar();renderCart();return}
   if(t.dataset.p){payChoice=t.dataset.p;renderCart();return}
+  if(t.id==="shareBtn"){
+    if(!shareFiles){toast("Préparation en cours, réessayez");return}
+    var nav=navigator;
+    nav.share({files:shareFiles,title:"Commande "+orderRef+" · K-Bine CI",text:"Commande "+orderRef+" : capture de mon paiement Wave, puis ma facture."})
+      .catch(function(er){ if(er && er.name!=="AbortError") toast("Partage impossible : utilisez le lien WhatsApp ci-dessous") });
+    return }
   if(t.id==="send"){
     var er2 = orderError();
     if(er2){e.preventDefault();showErr("err",er2);focusBad();return}
@@ -1113,6 +1128,23 @@ $("sheet").addEventListener("click",function(e){if(e.target===this)closeSheet()}
 $("num").addEventListener("input",function(){renderInvoice();renderSteps();buildLink()});
 $("email").addEventListener("input",function(){renderInvoice();renderSteps();buildLink()});
 $("cname").addEventListener("input",function(){renderInvoice();renderSteps();buildLink()});
+/* Prépare, une fois le paiement déclaré, les 2 fichiers à partager : 1) la capture Wave, 2) la facture en image */
+function prepShare(ref){
+  shareFiles = null;
+  try{
+    if(typeof navigator.share!=="function" || typeof navigator.canShare!=="function" || !shot) return;
+    var o=null; moLoad().forEach(function(x){if(x.ref===ref)o=x}); if(!o) return;
+    var shotCopy = shot;
+    moInvoiceBlob(o).then(function(b){
+      if(!b || orderRef!==ref) return;
+      var ext=({"image/png":"png","image/webp":"webp","image/gif":"gif"})[shotCopy.type]||"jpg";
+      var f1=new File([shotCopy],"capture-paiement-"+ref+"."+ext,{type:shotCopy.type||"image/jpeg"});
+      var f2=new File([b],"facture-"+ref+".png",{type:"image/png"});
+      var list=[f1,f2];
+      if(navigator.canShare({files:list})){ shareFiles=list; renderSteps() }
+    }).catch(function(){});
+  }catch(e){}
+}
 $("fabShare").addEventListener("click",function(){
   var url = location.href.split("#")[0];
   var text = "K-Bine CI : pass internet, pass appels et transfert d’unité Orange, MTN et Moov. Paiement avec Wave.";
