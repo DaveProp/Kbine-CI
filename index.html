@@ -380,13 +380,16 @@ function orderError(){
 
 /* ===== Base de données (Supabase) : enregistrement des commandes + prix modifiables depuis l'admin ===== */
 var DB = (function(){var c=window.KB_CONFIG;return (c&&c.url&&c.key&&!/VOTRE-/.test(c.url))?c:null})();
-var orderSaved = false;
+var orderSaved = false, uploadErr = "";
 function dbFetch(path,opt){
   opt = opt||{};
   /* Les nouvelles clés "sb_publishable_..." ne sont pas des JWT : on les envoie seulement dans apikey */
   var h = {apikey:DB.key}; if(!/^sb_/.test(DB.key)) h.Authorization = "Bearer "+DB.key;
   opt.headers = Object.assign(h,opt.headers||{});
-  return fetch(DB.url+path,opt).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r});
+  return fetch(DB.url+path,opt).then(function(r){
+    if(r.ok) return r;
+    return r.text().then(function(t){throw new Error("HTTP "+r.status+" "+String(t).slice(0,160))},function(){throw new Error("HTTP "+r.status)});
+  });
 }
 function loadRemote(){
   if(!DB) return;
@@ -423,10 +426,10 @@ function saveOrder(){
     receipt_path:path, status:"paid_declared"
   };
   return dbFetch("/storage/v1/object/receipts/"+path,{method:"POST",headers:{"Content-Type":shot.type||"image/jpeg"},body:shot})
-    .catch(function(){row.receipt_path=null})
+    .catch(function(e){row.receipt_path=null;uploadErr=String(e&&e.message||e)})
     .then(function(){return dbFetch("/rest/v1/orders",{method:"POST",headers:{"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(row)})})
     .then(function(){return true})
-    .catch(function(){orderSaved=false;return false});
+    .catch(function(e){orderSaved=false;uploadErr=String(e&&e.message||e);return false});
 }
 
 var SHOT_MAX = 10*1024*1024;
@@ -775,7 +778,8 @@ document.addEventListener("click",function(e){
   if(t.id==="wavePay"){ if(orderError()){e.preventDefault();return} payClicked=true; setTimeout(renderSteps,0); return }
   if(t.id==="paidBtn"){ if(!shotValid()){showErr("txErr",shotError()||"Ajoutez la capture d'écran de votre paiement Wave.");return} paid=true; sheetStep=3; pushNav(); renderCart();
     $("saveNote").textContent="";
-    saveOrder().then(function(ok){ if(DB) $("saveNote").textContent = ok ? "Commande enregistrée." : "Enregistrement en ligne impossible : envoyez bien la commande sur WhatsApp." });
+    uploadErr = "";
+    saveOrder().then(function(ok){ if(DB) $("saveNote").textContent = (ok ? (uploadErr ? "Commande enregistrée, mais capture non envoyée : " : "Commande enregistrée.") : "Enregistrement en ligne impossible : envoyez bien la commande sur WhatsApp. ") + (uploadErr && (!ok || true) ? " ["+uploadErr+"]" : "") });
     return }
   if(t.id==="nextBtn"){ var ne=orderError(); if(ne){showErr("err",ne);$("num").focus();return} showErr("err",""); sheetStep=2; pushNav(); renderCart(); return }
   if(t.id==="openCart"){openSheet();return}
