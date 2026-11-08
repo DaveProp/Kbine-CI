@@ -338,6 +338,7 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
 </div>
 
 <script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js" async></script>
 <script>
 /* ===== Données : modifiez ici les prix et contenus ===== */
 var PHONE_INTL = "2250717521322";
@@ -425,7 +426,14 @@ function saveOrder(){
     email:$("email").value.trim()||null, amount:l.price===null?0:l.price, fee:l.fee||0, total:total(),
     receipt_path:path, status:"paid_declared"
   };
-  return dbFetch("/storage/v1/object/receipts/"+path,{method:"POST",headers:{"Content-Type":shot.type||"image/jpeg"},body:shot})
+  var up;
+  if(window.supabase){
+    up = window.supabase.createClient(DB.url,DB.key).storage.from("receipts").upload(path,shot,{contentType:shot.type||"image/jpeg"})
+      .then(function(r){if(r.error)throw new Error(r.error.message||"upload")});
+  } else {
+    up = dbFetch("/storage/v1/object/receipts/"+path,{method:"POST",headers:{"Content-Type":shot.type||"image/jpeg"},body:shot});
+  }
+  return up
     .catch(function(e){row.receipt_path=null;uploadErr=String(e&&e.message||e)})
     .then(function(){return dbFetch("/rest/v1/orders",{method:"POST",headers:{"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(row)})})
     .then(function(){return true})
