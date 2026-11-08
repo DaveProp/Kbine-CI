@@ -334,7 +334,7 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
     <div><b>Service client en ligne</b><br><span class="note">Une question avant de commander ?</span></div>
     <span class="num" id="phoneShown"></span>
   </div>
-  <p class="disc">K-Bine CI est un revendeur indépendant, non affilié à Orange, MTN, Moov Africa ou Wave.</p>
+  <p class="disc" id="disc">K-Bine CI est un revendeur indépendant, non affilié à Orange, MTN, Moov Africa ou Wave.</p>
 </div>
 
 <div class="bar"><div class="in">
@@ -460,7 +460,7 @@ function loadRemote(){
   ]).then(function(res){
     res[0].forEach(function(s){
       var v=parseFloat(s.value); if(isNaN(v)) return;
-      if(s.key==="sub_fee") SUB_FEE=v; else if(s.key==="transfer_rate") TRANSFER_RATE=v; else if(s.key==="transfer_min") TRANSFER_MIN=v;
+      if(s.key==="sub_fee") SUB_FEE=v; else if(s.key==="sub_fee_rate") SUB_FEE_PCT=v; else if(s.key==="sub_fee_from") SUB_FEE_FROM=v; else if(s.key==="transfer_rate") TRANSFER_RATE=v; else if(s.key==="transfer_min") TRANSFER_MIN=v;
     });
     var ov={}; res[1].forEach(function(o){ov[o.item_id]=o});
     ["orange","mtn","moov"].forEach(function(op){
@@ -720,6 +720,7 @@ function renderView(){
   if(screen!=="home") h = topbarHTML()+h;
   $("view").innerHTML = h;
   $("contactBox").hidden = screen !== "home";
+  $("disc").hidden = screen !== "home";
   $("fab").hidden = screen === "home";
   $("fabShare").classList.toggle("low", screen === "home");
   $("fab").href = "https://wa.me/"+PHONE_INTL+"?text="+encodeURIComponent("Bonjour K-Bine CI, j’ai une question.");
