@@ -382,7 +382,10 @@ function orderError(){
 var DB = (function(){var c=window.KB_CONFIG;return (c&&c.url&&c.key&&!/VOTRE-/.test(c.url))?c:null})();
 var orderSaved = false;
 function dbFetch(path,opt){
-  opt = opt||{}; opt.headers = Object.assign({apikey:DB.key,Authorization:"Bearer "+DB.key},opt.headers||{});
+  opt = opt||{};
+  /* Les nouvelles clés "sb_publishable_..." ne sont pas des JWT : on les envoie seulement dans apikey */
+  var h = {apikey:DB.key}; if(!/^sb_/.test(DB.key)) h.Authorization = "Bearer "+DB.key;
+  opt.headers = Object.assign(h,opt.headers||{});
   return fetch(DB.url+path,opt).then(function(r){if(!r.ok)throw new Error("HTTP "+r.status);return r});
 }
 function loadRemote(){
