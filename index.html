@@ -139,6 +139,48 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
 .ir span{color:var(--muted);flex:none}
 .ir b{text-align:right;overflow-wrap:anywhere;font-weight:600;min-width:0}
 .irt{border-top:1px solid var(--line);margin-top:4px;padding-top:8px;font-family:var(--font-display);font-weight:800;font-size:1.2rem;display:flex;justify-content:space-between;gap:12px}
+.btn.alt{background:var(--bg);color:var(--fg);border:1.5px solid var(--line)}
+.hx-btn.c{background:#fff;color:var(--fg);border:1.5px solid var(--line);grid-column:1/-1}
+.hx-btn.c .arrow{background:var(--green-soft);color:var(--green)}
+.mo-ic{width:52px;height:52px;border-radius:14px;background:var(--green-soft);color:var(--green);display:grid;place-items:center;flex:none}
+.mo-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin:6px 0 8px}
+.mo-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;margin:10px 0;display:grid;gap:10px}
+.mo-top{display:flex;align-items:center;gap:10px}
+.mo-top img{width:40px;height:40px;border-radius:50%;background:#fff;object-fit:cover;border:1px solid var(--line);flex:none}
+.mo-top .m{flex:1;min-width:0;display:grid;line-height:1.25}
+.mo-top .m b{overflow-wrap:anywhere}.mo-top .m span{color:var(--muted);font-size:.78rem}
+.mo-tot{font-family:var(--font-display);font-weight:800;font-size:1.05rem;white-space:nowrap}
+.mo-b{display:inline-block;padding:3px 12px;border-radius:999px;font-weight:800;font-size:.78rem;justify-self:start}
+.mo-b.s1{background:var(--orange-soft);color:#9a5200}.mo-b.s2,.mo-b.s3{background:var(--green-soft);color:#146b2e}.mo-b.sx{background:#fbe9e7;color:var(--danger)}
+.mo-d{margin:0;color:var(--muted);font-size:.86rem}
+.mo-can{background:#fbe9e7;color:var(--danger);border-radius:10px;padding:8px 12px;font-weight:700;font-size:.86rem}
+.mo-warn{background:var(--orange-soft);color:#7a4300;border-radius:10px;padding:8px 12px;font-size:.82rem}
+.mo-wa{display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:12px;padding:10px;font-weight:700;font-size:.9rem;color:#06220f;background:#25d366}
+.mo-empty{display:grid;gap:4px;text-align:center;padding:22px 14px;border:1.5px dashed var(--line);border-radius:16px;color:var(--muted);margin:10px 0}
+.mo-empty b{color:var(--fg)}
+.mo-find{margin:14px 0;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:0 14px}
+.mo-find summary{cursor:pointer;font-weight:700;padding:13px 0}
+.mo-form{display:grid;gap:8px;padding:0 0 14px}
+.mo-form label{font-weight:700;font-size:.85rem}
+.mo-form input{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;width:100%}
+
+.inv2{border:1.5px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.inv2 .ih{display:flex;align-items:center;gap:12px;padding:12px 14px;background:linear-gradient(135deg,#157a35,#1d8a3c);color:#fff}
+.inv2 .il{width:46px;height:46px;border-radius:50%;background:#fff;object-fit:cover;flex:none}
+.inv2 .it{flex:1;min-width:0;display:grid;line-height:1.15}
+.inv2 .it b{font-family:var(--font-display);font-weight:800;font-size:1.15rem;letter-spacing:.02em}
+.inv2 .it span{font-size:.78rem;opacity:.9;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.inv2 .qbtn{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.5);color:#fff}
+.inv2 .im{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 14px;background:var(--orange-soft);font-size:.8rem;color:#7a4300}
+.inv2 .im b{font-weight:800}
+.inv2 .is{padding:10px 14px 4px}
+.inv2 .is h4{margin:0 0 4px;font-family:var(--font-display);font-weight:800;font-size:.95rem;color:var(--green);text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.inv2 .is h4::after{content:"";flex:1;border-top:2px dotted var(--line)}
+.inv2 .ir{padding:6px 0 6px 16px;border-bottom:1px dotted var(--line);position:relative}
+.inv2 .ir:last-child{border-bottom:0}
+.inv2 .ir::before{content:"";position:absolute;left:3px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;background:var(--orange)}
+.inv2 .irt{margin:6px 0 0;padding:12px 14px;background:var(--green-soft);border-top:2px solid var(--green);color:var(--green)}
+.inv2 .ft{padding:8px 14px 12px;text-align:center;font-size:.78rem;color:var(--muted)}
 .err{color:var(--danger);font-size:.85rem;margin:0}
 .close{justify-self:end;border:0;background:none;color:var(--muted);font:inherit;cursor:pointer;padding:4px 0}
 .contact{margin-top:22px;padding:14px;border-radius:14px;background:var(--green-soft);display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:space-between}
@@ -309,9 +351,11 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
     <div id="lines"></div>
     <div class="total" hidden><span>Total</span><span id="grand">0 F CFA</span></div>
     <div id="numBox">
-      <label for="num" id="numLabel">Numéro à recharger</label>
+      <label for="cname">Nom complet (obligatoire)</label>
+      <input id="cname" type="text" placeholder="Ex. Kouassi Awa" autocomplete="name" autocapitalize="words" maxlength="80">
+      <label for="num" id="numLabel" style="margin-top:10px">Numéro à recharger</label>
       <input id="num" type="tel" inputmode="tel" placeholder="Ex. 07 00 00 00 00" autocomplete="tel">
-      <label for="email" style="margin-top:10px">Email (facultatif)</label>
+      <label for="email" style="margin-top:10px">Email (obligatoire)</label>
       <input id="email" type="email" inputmode="email" placeholder="vous@exemple.com" autocomplete="email">
     </div>
     <div id="payBox" hidden><div class="pay" id="pay"></div></div>
@@ -331,8 +375,10 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
       <span class="note" id="waveNote"></span>
     </div>
     <p class="err" id="err" hidden></p>
-    <div class="dnbox" id="doneBox" hidden><span class="ok">&#10003;</span><b>Paiement déclaré</b><span class="note">Dernière étape : envoyez votre commande sur WhatsApp, puis joignez la capture d'écran de votre paiement (trombone, puis Galerie). Votre forfait est livré dès que votre paiement est vérifié.</span><span class="note" id="saveNote"></span></div>
+    <div class="dnbox" id="doneBox" hidden><span class="ok">&#10003;</span><b>Paiement déclaré</b><span class="note" id="doneNote"></span><span class="note" id="saveNote"></span></div>
+    <button type="button" class="btn ok" id="sendShare" hidden>Envoyer la capture et la facture sur WhatsApp</button>
     <a class="btn" id="send" href="#" target="_blank" rel="noopener" hidden>Envoyer la commande sur WhatsApp</a>
+    <button type="button" class="btn alt" id="trackBtn" hidden>Suivre ma commande</button>
     <p class="note" id="foot" hidden>Joignez la capture du reçu Wave dans la conversation WhatsApp.</p>
   </div>
 </div>
@@ -371,11 +417,20 @@ function checkNum(v,op){
   else if(!/^(01|05|07)/.test(d)) return "Le numéro doit commencer par 01, 05 ou 07.";
   return "";
 }
+function nameClean(){return $("cname").value.replace(/\s+/g," ").trim()}
+function focusBad(){
+  if(nameClean().length<2){$("cname").focus();return}
+  var em=$("email").value.trim();
+  if(!em||!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){$("email").focus();return}
+  $("num").focus();
+}
 function orderError(){
   if(!cart.length) return "Choisissez d'abord un forfait.";
   var l = cart[0];
+  if(nameClean().length<2) return "Entrez votre nom complet.";
   var em = $("email").value.trim();
-  if(em && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) return "Cet email ne semble pas valide (ou laissez le champ vide).";
+  if(!em) return "Entrez votre email.";
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) return "Cet email ne semble pas valide.";
   return checkNum($("num").value, l.kind==="tf" ? null : l.op);
 }
 
@@ -413,6 +468,18 @@ function loadRemote(){
     if(!cart.length && $("sheet").hidden) renderView();
   }).catch(function(){});
 }
+function postOrder(row){
+  function post(r){return dbFetch("/rest/v1/orders",{method:"POST",headers:{"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(r)})}
+  return post(row).catch(function(e){
+    /* Colonne customer_name pas encore créée dans la base : on enregistre quand même la commande, avec le nom dans la note */
+    if(/customer_name/.test(String(e&&e.message))){
+      var r2=Object.assign({},row); delete r2.customer_name;
+      r2.note="Client : "+row.customer_name+(row.note?" · "+row.note:"");
+      return post(r2);
+    }
+    throw e;
+  });
+}
 function saveOrder(){
   var l = cart[0];
   if(!DB || !l || orderSaved) return Promise.resolve(false);
@@ -422,7 +489,7 @@ function saveOrder(){
   var tf = l.kind==="tf";
   var row = {
     ref:orderRef, kind:tf?"tf":"sub", operator:l.op, category:l.cat||null, item_id:tf?null:l.key,
-    item_name:l.name, note:l.note||null, phone:cleanNum($("num").value), dest_phone:tf?cleanNum(l.dest):null,
+    customer_name:nameClean(), item_name:l.name, note:l.note||null, phone:cleanNum($("num").value), dest_phone:tf?cleanNum(l.dest):null,
     email:$("email").value.trim()||null, amount:l.price===null?0:l.price, fee:l.fee||0, total:total(),
     receipt_path:path, status:"paid_declared"
   };
@@ -435,7 +502,7 @@ function saveOrder(){
   }
   return up
     .catch(function(e){row.receipt_path=null;uploadErr=String(e&&e.message||e)})
-    .then(function(){return dbFetch("/rest/v1/orders",{method:"POST",headers:{"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify(row)})})
+    .then(function(){return postOrder(row)})
     .then(function(){return true})
     .catch(function(e){orderSaved=false;uploadErr=String(e&&e.message||e);return false});
 }
@@ -451,7 +518,7 @@ function shotError(file){
 }
 function resetShot(){
   if(shotUrl){try{URL.revokeObjectURL(shotUrl)}catch(e){}}
-  shotUrl = ""; shot = null;
+  shotUrl = ""; shot = null; invFile = null;
   var i=$("shot"); if(i) i.value="";
   var p=$("shotPrev"); if(p){p.hidden=true;p.removeAttribute("src")}
   var b=$("shotBtn"); if(b) b.textContent="Choisir la capture d'écran";
@@ -513,6 +580,7 @@ function homeHTML(){
    '<div class="hx-cta">'+
      '<button type="button" class="hx-btn a" data-go="tf"><img src="'+IMG.transfert+'" alt=""><div><b>Transfert d’unité</b><span class="t">Envoyez des unités sur Orange, MTN ou Moov</span></div><span class="arrow">›</span></button>'+
      '<button type="button" class="hx-btn b" data-go="ops"><img src="'+IMG.internet+'" alt=""><div><b>Souscription</b><span class="t">Pass internet et pass appels</span></div><span class="arrow">›</span></button>'+
+     '<button type="button" class="hx-btn c" data-go="orders"><span class="mo-ic"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1z"/><path d="M8 6H6a1 1 0 0 0-1 1v13a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1h-2"/><path d="M8.5 13l2.2 2.2L15.5 10.5"/></svg></span><div><b>Mes commandes</b><span class="t">Suivez l’état de vos commandes</span></div><span class="arrow">›</span></button>'+
    '</div>'+
    '<div class="hx-mq" aria-hidden="true"><div class="hx-track">'+tg+'</div></div>'+
    '<div class="hx-stats">'+
@@ -560,6 +628,7 @@ function stepperHTML(labels,cur){
   }).join("")+'</ol>';
 }
 function topbarHTML(){
+  if(screen==="orders") return '<div class="tb"><button type="button" class="mini" data-back="1" aria-label="Retour">&#8249;</button></div>';
   var labels,cur;
   if(screen==="tf"){labels=["Transfert","Paiement"];cur=1}
   else{labels=["Opérateur","Catégorie","Forfait","Paiement"];cur=screen==="ops"?1:(moovCat?3:2)}
@@ -576,7 +645,7 @@ function applySnap(st){
 function localBack(){
   if(!$("sheet").hidden){if(sheetStep>1){sheetStep--;renderCart()}else{$("sheet").hidden=true}return}
   if(screen==="sub"){if(moovCat)moovCat=null;else screen="ops"}
-  else if(screen==="ops"||screen==="tf"){screen="home"}
+  else if(screen==="ops"||screen==="tf"||screen==="orders"){screen="home"}
   renderTabs();renderView();window.scrollTo(0,0);
 }
 function goBack(){if(navOK&&idx>0){history.back()}else{localBack()}}
@@ -607,6 +676,8 @@ function renderView(){
       '<p class="note">Montant minimum : '+fmt(TRANSFER_MIN)+'. Frais de service : '+Math.round(TRANSFER_RATE*100)+' % du montant transféré.</p>'+
       '<p class="err" id="tfErr" hidden></p>'+
       '<button class="add" type="button" id="tfAdd">Validé</button></div>';
+  } else if(screen==="orders"){
+    h = ordersHTML();
   } else {
     var back = "";
     if(subOp==="moov"||subOp==="mtn"||subOp==="orange"){
@@ -647,6 +718,7 @@ function renderView(){
   $("fab").hidden = screen === "home";
   $("fabShare").classList.toggle("low", screen === "home");
   $("fab").href = "https://wa.me/"+PHONE_INTL+"?text="+encodeURIComponent("Bonjour K-Bine CI, j’ai une question.");
+  if(screen==="orders") moRefresh(false);
   if(screen==="home"){ homeFx(); var v=document.querySelector(".hx-vid"); if(v){v.muted=true; var pp=v.play&&v.play(); if(pp&&pp.catch)pp.catch(function(){})} }
 }
 function findItem(id){
@@ -678,45 +750,132 @@ function updateBar(){
   $("barCount").textContent = n? n+(n>1?" articles":" article") : "Panier vide";
   $("openCart").classList.toggle("off", !n);
 }
-function invoiceRows(){
+function wa(x){return String(x==null?"":x).replace(/[*_~`]/g,"")}
+function invoiceSections(){
   var l=cart[0]; if(!l) return [];
-  var num=$("num").value.trim();
-  var r=[["Référence",orderRef],["Date",orderDate]];
+  var num=$("num").value.trim(), nm=nameClean(), em=$("email").value.trim();
+  var cl=[["Nom",nm||"à renseigner"],["Email",em||"à renseigner"]], od=[], am=[];
   if(l.kind==="tf"){
-    r.push(["Type de service","Transfert d'unité"]);
-    r.push(["Réseau du bénéficiaire",OPNAME[l.op]]);
-    r.push(["Numéro du bénéficiaire",l.dest]);
-    r.push(["Montant transféré",fmt(l.price)]);
-    r.push(["Frais de service ("+Math.round(TRANSFER_RATE*100)+" %)",fmt(l.fee)]);
-    r.push(["Numéro de l'expéditeur",num||"à renseigner"]);
+    cl.push(["Numéro de l'expéditeur",num||"à renseigner"]);
+    od.push(["Service","Transfert d'unité"],["Réseau du bénéficiaire",OPNAME[l.op]],["Numéro du bénéficiaire",l.dest]);
+    am.push(["Montant transféré",fmt(l.price)],["Frais de service ("+Math.round(TRANSFER_RATE*100)+" %)",fmt(l.fee)]);
   } else {
-    r.push(["Type de service","Souscription"]);
-    r.push(["Opérateur",OPNAME[l.op]]);
-    if(l.cat) r.push(["Catégorie",l.cat]);
-    r.push(["Forfait",l.name]);
-    if(l.note) r.push(["Contenu et durée",l.note]);
-    r.push(["Numéro à recharger",num||"à renseigner"]);
-    r.push(["Prix du forfait",l.price===null?"à confirmer":fmt(l.price)]);
-    r.push(["Frais de service",fmt(l.fee||0)]);
+    cl.push(["Numéro à recharger",num||"à renseigner"]);
+    od.push(["Service","Souscription"],["Opérateur",OPNAME[l.op]]);
+    if(l.cat) od.push(["Catégorie",l.cat]);
+    od.push(["Forfait",l.name]);
+    if(l.note) od.push(["Contenu et durée",l.note]);
+    am.push(["Prix du forfait",l.price===null?"à confirmer":fmt(l.price)],["Frais de service",fmt(l.fee||0)]);
   }
-  r.push(["Paiement",payChoice+(paid?" : payé (déclaré par le client)":" : en attente")]);
-  if(shot) r.push(["Capture du paiement Wave","Ajoutée"]);
-  return r;
+  var py=[["Mode de paiement",payChoice],["Statut",paid?"Payé (déclaré par le client)":"En attente de paiement"]];
+  if(shot) py.push(["Capture du paiement","Jointe"]);
+  return [{title:"Client",rows:cl},{title:"Détails de la commande",rows:od},{title:"Montant",rows:am},{title:"Paiement",rows:py}];
 }
 function totalText(){var l=cart[0];return l&&l.price===null?"à confirmer":fmt(total())}
 function invoiceText(){
   if(!cart.length) return "";
-  var t="*FACTURE K-BINE CI*\n";
-  invoiceRows().forEach(function(x){t+=x[0]+" : "+x[1]+"\n"});
-  t += "\n*TOTAL À PAYER : "+totalText()+"*";
-  if(shot) t += "\n\nLa capture d'écran de mon paiement Wave suit juste après ce message.";
+  var line="┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄";
+  var t="*FACTURE K-BINE CI*\n_Réf. "+orderRef+" · "+orderDate+"_\n"+line+"\n";
+  invoiceSections().forEach(function(sc){
+    t+="\n*"+sc.title.toUpperCase()+"*\n";
+    sc.rows.forEach(function(r){t+="• "+r[0]+" : *"+wa(r[1])+"*\n"});
+  });
+  t+="\n"+line+"\n*TOTAL À PAYER : "+totalText()+"*\n"+line;
+  if(shot) t+="\n_La capture d'écran de mon paiement Wave est jointe._";
+  t+="\n\nMerci pour votre confiance.";
   return t;
 }
 function renderInvoice(){
   if(!cart.length){$("lines").innerHTML='<p class="note">Aucun forfait choisi.</p>';return}
-  $("lines").innerHTML='<div class="inv"><div class="hd"><b>Facture</b><button type="button" class="qbtn" data-rm="0">Retirer</button></div>'+
-    invoiceRows().map(function(x){return '<div class="ir"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'}).join("")+
-    '<div class="irt"><span>Total à payer</span><span>'+esc(totalText())+'</span></div></div>';
+  $("lines").innerHTML='<div class="inv2"><div class="ih"><img class="il" src="'+IMG.logo+'" alt="K-Bine CI"><div class="it"><b>K-BINE CI</b><span>Facture</span></div><button type="button" class="qbtn" data-rm="0">Retirer</button></div>'+
+    '<div class="im"><span>Réf. <b>'+esc(orderRef)+'</b></span><span>'+esc(orderDate)+'</span></div>'+
+    invoiceSections().map(function(sc){return '<div class="is"><h4>'+esc(sc.title)+'</h4>'+sc.rows.map(function(x){return '<div class="ir"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'}).join("")+'</div>'}).join("")+
+    '<div class="irt"><span>Total à payer</span><span>'+esc(totalText())+'</span></div>'+
+    '<div class="ft">Merci pour votre confiance · K-Bine CI · WhatsApp '+esc(PHONE_SHOWN)+'</div></div>';
+}
+
+/* ----- Facture en image (logo, titres en gras, pointillés) : envoyée sur WhatsApp après la capture ----- */
+var invFile = null;
+function wrapLines(ctx,text,maxW){
+  var words=String(text).split(" "),lines=[],cur="";
+  words.forEach(function(w){var t=cur?cur+" "+w:w; if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w}else cur=t});
+  if(cur) lines.push(cur); return lines;
+}
+function loadImg(src){return new Promise(function(res){var i=new Image();i.onload=function(){res(i)};i.onerror=function(){res(null)};i.src=src})}
+function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function makeInvoiceBlob(){
+  var secs=invoiceSections(), W=900, P=56, F="'DM Sans','Segoe UI',Arial,sans-serif", FD="'Bricolage Grotesque','Trebuchet MS',Arial,sans-serif";
+  var fontsReady = (document.fonts&&document.fonts.load) ? Promise.all([document.fonts.load("700 26px 'DM Sans'"),document.fonts.load("800 40px 'Bricolage Grotesque'")]).catch(function(){}) : Promise.resolve();
+  return Promise.all([loadImg(IMG.logo),fontsReady]).then(function(res){
+    var logo=res[0], cv=document.createElement("canvas"), ctx=cv.getContext("2d");
+    ctx.font="700 26px "+F;
+    var VW=W-2*P-300, H=300;
+    secs.forEach(function(sc){H+=62; sc.rows.forEach(function(r){H+=Math.max(1,wrapLines(ctx,r[1],VW).length)*36+12})});
+    H+=262; cv.width=W; cv.height=H;
+    ctx.fillStyle="#fff"; ctx.fillRect(0,0,W,H);
+    var g=ctx.createLinearGradient(0,0,W,210); g.addColorStop(0,"#157a35"); g.addColorStop(1,"#1d8a3c");
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,210);
+    ctx.fillStyle="#f07d00"; ctx.fillRect(0,210,W,8);
+    ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(P+60,105,60,0,Math.PI*2); ctx.fill();
+    if(logo){ctx.save();ctx.beginPath();ctx.arc(P+60,105,56,0,Math.PI*2);ctx.clip();ctx.drawImage(logo,P+4,49,112,112);ctx.restore()}
+    ctx.textBaseline="alphabetic"; ctx.textAlign="left"; ctx.fillStyle="#fff";
+    ctx.font="800 50px "+FD; ctx.fillText("K-BINE CI",P+142,98);
+    ctx.font="500 22px "+F; ctx.fillStyle="rgba(255,255,255,.92)"; ctx.fillText("Pass internet · Appels · Transfert d'unité",P+142,134);
+    ctx.textAlign="right"; ctx.fillStyle="#fff"; ctx.font="800 40px "+FD; ctx.fillText("FACTURE",W-P,80);
+    ctx.fillStyle="#fff1de"; ctx.fillRect(0,218,W,58);
+    ctx.fillStyle="#7a4300"; ctx.textAlign="left"; ctx.font="500 23px "+F; ctx.fillText("Réf. ",P,255);
+    var rw=ctx.measureText("Réf. ").width; ctx.font="800 23px "+F; ctx.fillText(orderRef,P+rw,255);
+    ctx.textAlign="right"; ctx.font="600 23px "+F; ctx.fillText(orderDate,W-P,255);
+    var y=336;
+    secs.forEach(function(sc){
+      ctx.textAlign="left"; ctx.fillStyle="#1d8a3c"; ctx.font="800 27px "+FD; ctx.fillText(sc.title.toUpperCase(),P,y);
+      var tw=ctx.measureText(sc.title.toUpperCase()).width;
+      ctx.save(); ctx.strokeStyle="#c9d6c9"; ctx.lineWidth=3; ctx.setLineDash([2,8]); ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(P+tw+16,y-9); ctx.lineTo(W-P,y-9); ctx.stroke(); ctx.restore();
+      y+=18;
+      sc.rows.forEach(function(r){
+        ctx.font="700 26px "+F; var vl=wrapLines(ctx,r[1],VW), rh=Math.max(1,vl.length)*36;
+        y+=34;
+        ctx.fillStyle="#f07d00"; ctx.beginPath(); ctx.arc(P+8,y-9,6,0,Math.PI*2); ctx.fill();
+        ctx.textAlign="left"; ctx.fillStyle="#5b6b60"; ctx.font="500 24px "+F; ctx.fillText(r[0],P+26,y);
+        ctx.textAlign="right"; ctx.fillStyle="#14231a"; ctx.font="700 26px "+F;
+        vl.forEach(function(t,i){ctx.fillText(t,W-P,y+i*36)});
+        y+=rh-36+14;
+        ctx.save(); ctx.strokeStyle="#dfe6dc"; ctx.lineWidth=2; ctx.setLineDash([2,7]); ctx.beginPath(); ctx.moveTo(P,y); ctx.lineTo(W-P,y); ctx.stroke(); ctx.restore();
+      });
+      y+=44;
+    });
+    y-=10;
+    ctx.fillStyle="#e4f3e8"; rrect(ctx,P,y,W-2*P,112,18); ctx.fill();
+    ctx.strokeStyle="#1d8a3c"; ctx.lineWidth=3; rrect(ctx,P,y,W-2*P,112,18); ctx.stroke();
+    ctx.textAlign="left"; ctx.fillStyle="#14231a"; ctx.font="800 30px "+FD; ctx.fillText("TOTAL À PAYER",P+30,y+68);
+    ctx.textAlign="right"; ctx.fillStyle="#1d8a3c"; ctx.font="800 46px "+FD; ctx.fillText(totalText(),W-P-30,y+72);
+    y+=112+58;
+    ctx.textAlign="center"; ctx.fillStyle="#14231a"; ctx.font="800 26px "+FD; ctx.fillText("Merci pour votre confiance",W/2,y);
+    ctx.fillStyle="#5b6b60"; ctx.font="500 21px "+F; ctx.fillText("K-Bine CI · Abidjan, Côte d'Ivoire · WhatsApp "+PHONE_SHOWN,W/2,y+36);
+    return new Promise(function(done){cv.toBlob(done,"image/png")});
+  });
+}
+function prepInvoice(){
+  return makeInvoiceBlob().then(function(b){invFile=new File([b],"facture-"+orderRef+".png",{type:"image/png"});return invFile});
+}
+function canShareFiles(){
+  try{return !!(navigator.canShare && navigator.share && navigator.canShare({files:[new File([new Blob(["x"])],"a.png",{type:"image/png"})]}))}catch(e){return false}
+}
+var CAN_SHARE_FILES = canShareFiles();
+function shareOrder(){
+  var er=orderError(); if(er){showErr("err",er);focusBad();return}
+  if(!shotValid()){showErr("err","Ajoutez la capture d'écran de votre paiement Wave.");return}
+  var msg="Bonjour K-Bine CI, voici ma commande :\n\n"+invoiceText();
+  function fallback(){window.open("https://wa.me/"+PHONE_INTL+"?text="+encodeURIComponent(msg),"_blank","noopener")}
+  var ext=({"image/png":"png","image/webp":"webp","image/gif":"gif","image/heic":"heic"})[shot.type]||"jpg";
+  var cap=new File([shot],"capture-paiement-"+orderRef+"."+ext,{type:shot.type||"image/jpeg"});
+  function go(inv){
+    var files=inv?[cap,inv]:[cap];   /* la capture en premier, puis la facture */
+    if(navigator.canShare && navigator.canShare({files:files})){
+      navigator.share({files:files,text:msg,title:"Commande K-Bine CI "+orderRef}).catch(function(e){if(!e||e.name!=="AbortError")fallback()});
+    } else fallback();
+  }
+  (invFile?Promise.resolve(invFile):prepInvoice()).then(go,function(){go(null)});
 }
 function renderSteps(){
   var has = cart.length && total()>0;
@@ -725,7 +884,7 @@ function renderSteps(){
   if(sheetStep>1 && !numOk) sheetStep=1;
   if(sheetStep===3 && !paid) sheetStep=2;
   var st = sheetStep;
-  $("sheetStp").innerHTML = stepperHTML(["Numéro","Paiement","Envoi"], st);
+  $("sheetStp").innerHTML = stepperHTML(["Infos","Paiement","Envoi"], st);
   $("shTitle").textContent = st===1 ? "Vos informations" : (st===2 ? "Paiement" : "Envoi de la commande");
   $("shNote").hidden = st!==1;
   $("numBox").hidden = st!==1;
@@ -743,9 +902,18 @@ function renderSteps(){
   $("waveTitle").textContent = paid ? "Paiement déclaré effectué" : "Payer avec Wave";
   $("waveNote").textContent = payClicked ? "Une fois le paiement fait dans Wave, revenez ici, ajoutez la capture d'écran de votre reçu, puis appuyez sur « J'ai effectué le paiement »."
     : "Le montant à payer est celui de la facture. Appuyez sur le bouton Wave.";
-  $("num").readOnly = paid; $("email").readOnly = paid;
+  $("num").readOnly = paid; $("email").readOnly = paid; $("cname").readOnly = paid;
   $("doneBox").hidden = !(has && st===3 && paid);
-  $("send").hidden = !(has && st===3 && paid && numOk && shotOk);
+  var ready = has && st===3 && paid && numOk && shotOk;
+  $("sendShare").hidden = !(ready && CAN_SHARE_FILES);
+  $("send").hidden = !ready;
+  $("send").textContent = CAN_SHARE_FILES ? "Ou envoyer la facture en texte (sans la capture)" : "Envoyer la commande sur WhatsApp";
+  $("send").classList.toggle("alt", CAN_SHARE_FILES);
+  $("doneNote").textContent = CAN_SHARE_FILES
+    ? "Dernière étape : appuyez sur « Envoyer la capture et la facture sur WhatsApp », puis choisissez WhatsApp et le contact K-Bine CI ("+PHONE_SHOWN+"). La capture de votre paiement part en premier, suivie de la facture. Votre forfait est livré dès que votre paiement est vérifié."
+    : "Dernière étape : envoyez votre commande sur WhatsApp, puis joignez la capture d'écran de votre paiement (trombone, puis Galerie). Votre forfait est livré dès que votre paiement est vérifié.";
+  $("foot").textContent = CAN_SHARE_FILES ? "La capture et la facture sont envoyées ensemble : choisissez WhatsApp, puis le contact K-Bine CI." : "Joignez la capture du reçu Wave dans la conversation WhatsApp.";
+  $("trackBtn").hidden = !(has && st===3 && paid);
   $("foot").hidden = st!==3;
 }
 function renderCart(){
@@ -764,6 +932,106 @@ function buildLink(){
   $("send").href = er ? "#" : "https://wa.me/"+PHONE_INTL+"?text="+encodeURIComponent(msg);
   showErr("err", ($("num").value.trim() && er) ? er : "");
 }
+/* ===== Mes commandes : suivi de l'état des commandes ===== */
+var MO_KEY="kb_orders", moBusy=false, moMsg="", moGoFlag=false;
+var MO_STAGES=[
+  {t:"Commande reçue",d:"Votre paiement est déclaré et en cours de vérification."},
+  {t:"Paiement vérifié",d:"Votre paiement est confirmé, votre forfait est en préparation."},
+  {t:"Forfait livré",d:"Votre forfait a été livré. Merci pour votre confiance."}];
+function moLoad(){try{var a=JSON.parse(localStorage.getItem(MO_KEY)||"[]");return Array.isArray(a)?a:[]}catch(e){return []}}
+function moSave(a){try{a.sort(function(x,y){return String(y.date).localeCompare(String(x.date))});localStorage.setItem(MO_KEY,JSON.stringify(a.slice(0,50)))}catch(e){}}
+function moStage(st){
+  var x=String(st||"").toLowerCase();
+  if(/cancel|annul|reject|refus|fail|[eé]chou/.test(x)) return -1;
+  if(/deliver|livr|complet|termin|done/.test(x)) return 3;
+  if(/verif|vérif|valid|confirm|approv/.test(x)) return 2;
+  return 1;
+}
+function moRemember(){
+  var l=cart[0]; if(!l) return;
+  var a=moLoad().filter(function(o){return o.ref!==orderRef});
+  a.push({ref:orderRef,item:l.name,total:total(),op:l.op,phone:cleanNum($("num").value),email:$("email").value.trim(),date:new Date().toISOString(),status:"paid_declared",synced:false});
+  moSave(a);
+}
+function moMark(ref){var a=moLoad();a.forEach(function(o){if(o.ref===ref)o.synced=true});moSave(a)}
+function moMerge(rows,phone,email){
+  var a=moLoad();
+  (rows||[]).forEach(function(r){
+    var f=null; a.forEach(function(o){if(o.ref===r.ref)f=o});
+    if(f){f.status=r.status; f.synced=true; if(r.total!=null)f.total=r.total}
+    else a.push({ref:r.ref,item:r.item_name,total:r.total,op:r.operator,phone:phone,email:email,date:r.created_at||new Date().toISOString(),status:r.status,synced:true});
+  });
+  moSave(a);
+}
+function moDate(iso){try{return new Date(iso).toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})}catch(e){return ""}}
+function moCard(o){
+  var st=moStage(o.status), cx=st<0;
+  var wa="https://wa.me/"+PHONE_INTL+"?text="+encodeURIComponent("Bonjour K-Bine CI, où en est ma commande "+o.ref+" ("+o.item+") ?");
+  return '<article class="mo-card"><div class="mo-top">'+(IMG[o.op]?'<img src="'+IMG[o.op]+'" alt="">':'')+
+    '<div class="m"><b>'+esc(o.item||"Commande")+'</b><span>Réf. '+esc(o.ref)+' · '+esc(moDate(o.date))+'</span></div><span class="mo-tot">'+esc(fmt(o.total||0))+'</span></div>'+
+    '<span class="mo-b '+(cx?"sx":"s"+st)+'">'+(cx?"Annulée":(st===1?"En cours de vérification":(st===2?"Paiement vérifié":"Livrée")))+'</span>'+
+    (cx?'<div class="mo-can">Cette commande a été annulée. Contactez-nous sur WhatsApp pour plus d’informations.</div>'
+       :stepperHTML(["Reçue","Vérifiée","Livrée"],st===3?4:st)+'<p class="mo-d">'+esc(MO_STAGES[st-1].d)+'</p>')+
+    (o.synced===false&&DB?'<div class="mo-warn">Cette commande n’a pas pu être enregistrée en ligne : envoyez-la bien sur WhatsApp pour qu’elle soit traitée.</div>':'')+
+    '<a class="mo-wa" href="'+esc(wa)+'" target="_blank" rel="noopener">Une question sur cette commande ? WhatsApp</a></article>';
+}
+function moListHTML(){
+  var a=moLoad();
+  return a.length?a.map(moCard).join(""):'<div class="mo-empty"><b>Aucune commande sur cet appareil</b><span>Passez une commande : elle apparaîtra ici avec son état. Vous avez commandé depuis un autre téléphone ? Retrouvez vos commandes ci-dessous.</span></div>';
+}
+function ordersHTML(){
+  return '<div class="mo-hd"><div><h2 style="margin:0">Mes commandes</h2><p class="sub" style="margin:2px 0 0">Suivez l’état de vos commandes.</p></div><button type="button" class="qbtn" id="moRefresh">Actualiser</button></div>'+
+    '<p class="note" id="moMsg" aria-live="polite"></p><div id="moList">'+moListHTML()+'</div>'+
+    '<details class="mo-find"><summary>Retrouver mes commandes (autre téléphone)</summary><div class="mo-form">'+
+    '<label for="moPhone">Numéro utilisé pour la commande</label><input id="moPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="07 00 00 00 00">'+
+    '<label for="moEmail">Email utilisé pour la commande</label><input id="moEmail" type="email" inputmode="email" autocomplete="email" placeholder="vous@exemple.com">'+
+    '<p class="err" id="moErr" hidden></p><button type="button" class="btn" id="moFind">Retrouver mes commandes</button></div></details>';
+}
+function moPaint(){
+  if(screen!=="orders") return;
+  var m=$("moMsg"), l=$("moList"); if(m)m.textContent=moMsg; if(l)l.innerHTML=moListHTML();
+}
+function moRpc(phone,email){
+  return dbFetch("/rest/v1/rpc/my_orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({p_phone:phone,p_email:email})}).then(function(r){return r.json()});
+}
+function moErrText(e){return /PGRST202|404|my_orders/.test(String(e&&e.message))?"Le suivi en ligne n’est pas encore activé : l’état s’affichera dès que K-Bine CI l’aura activé.":"Impossible de mettre à jour pour le moment. Réessayez plus tard."}
+function moRefresh(manual){
+  if(moBusy) return;
+  if(!DB){moMsg="Le suivi en ligne n’est pas disponible pour le moment.";moPaint();return}
+  var seen={}, list=[];
+  moLoad().forEach(function(o){var k=o.phone+"|"+String(o.email||"").toLowerCase(); if(o.phone&&o.email&&!seen[k]){seen[k]=1;list.push([o.phone,o.email])}});
+  if(!list.length){moMsg=manual?"Aucune commande à actualiser.":"";moPaint();return}
+  moBusy=true; moMsg="Actualisation…"; moPaint();
+  var lastErr=null;
+  Promise.all(list.map(function(p){return moRpc(p[0],p[1]).then(function(rows){moMerge(rows,p[0],p[1]);return true},function(e){lastErr=e;return false})})).then(function(res){
+    moBusy=false;
+    moMsg=res.some(Boolean)?"Mis à jour à "+new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})+".":moErrText(lastErr);
+    moPaint();
+  });
+}
+function moFind(){
+  var ph=cleanNum($("moPhone").value), em=$("moEmail").value.trim(), er=$("moErr");
+  function bad(t){er.textContent=t;er.hidden=!t}
+  if(ph.replace(/\D/g,"").length<8){bad("Entrez le numéro utilisé pour la commande.");return}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){bad("Entrez l’email utilisé pour la commande.");return}
+  bad(""); if(!DB){bad("Le suivi en ligne n’est pas disponible pour le moment.");return}
+  moMsg="Recherche…"; moPaint();
+  moRpc(ph,em).then(function(rows){
+    moMerge(rows,ph,em);
+    moMsg=(rows&&rows.length)?rows.length+" commande"+(rows.length>1?"s":"")+" retrouvée"+(rows.length>1?"s":"")+".":"Aucune commande trouvée avec ce numéro et cet email.";
+    moPaint();
+  },function(e){moMsg=moErrText(e);moPaint()});
+}
+function openOrders(){
+  if(!$("sheet").hidden){
+    var n=idx-sheetBase;
+    if(navOK&&n>0){moGoFlag=true;history.go(-n);return}
+    $("sheet").hidden=true;
+  }
+  screen="orders";renderTabs();renderView();window.scrollTo(0,0);pushNav();
+}
+setInterval(function(){if(screen==="orders"&&!document.hidden)moRefresh(false)},30000);
+
 function showErr(id,t){var e=$(id);e.textContent=t;e.hidden=!t}
 
 document.addEventListener("click",function(e){
@@ -784,12 +1052,17 @@ document.addEventListener("click",function(e){
     addLine({key:"tf-"+tfOp+"-"+n+"-"+a,name:"Transfert d'unité vers "+OPNAME[tfOp],detail:n+" · ",kind:"tf",op:tfOp,dest:n,price:a,fee:Math.ceil(a*TRANSFER_RATE)},"Transfert validé");
     $("tfAmt").value="";return}
   if(t.id==="wavePay"){ if(orderError()){e.preventDefault();return} payClicked=true; setTimeout(renderSteps,0); return }
-  if(t.id==="paidBtn"){ if(!shotValid()){showErr("txErr",shotError()||"Ajoutez la capture d'écran de votre paiement Wave.");return} paid=true; sheetStep=3; pushNav(); renderCart();
+  if(t.id==="sendShare"){ shareOrder(); return }
+  if(t.id==="trackBtn"){ openOrders(); return }
+  if(t.id==="moRefresh"){ moRefresh(true); return }
+  if(t.id==="moFind"){ moFind(); return }
+  if(t.id==="paidBtn"){ if(!shotValid()){showErr("txErr",shotError()||"Ajoutez la capture d'écran de votre paiement Wave.");return} paid=true; sheetStep=3; pushNav(); renderCart(); invFile=null; prepInvoice().catch(function(){});
     $("saveNote").textContent="";
     uploadErr = "";
-    saveOrder().then(function(ok){ if(DB) $("saveNote").textContent = (ok ? (uploadErr ? "Commande enregistrée, mais capture non envoyée : " : "Commande enregistrée.") : "Enregistrement en ligne impossible : envoyez bien la commande sur WhatsApp. ") + (uploadErr && (!ok || true) ? " ["+uploadErr+"]" : "") });
+    moRemember(); var moRef = orderRef;
+    saveOrder().then(function(ok){ if(ok) moMark(moRef); if(DB) $("saveNote").textContent = (ok ? (uploadErr ? "Commande enregistrée, mais capture non envoyée : " : "Commande enregistrée.") : "Enregistrement en ligne impossible : envoyez bien la commande sur WhatsApp. ") + (uploadErr && (!ok || true) ? " ["+uploadErr+"]" : "") });
     return }
-  if(t.id==="nextBtn"){ var ne=orderError(); if(ne){showErr("err",ne);$("num").focus();return} showErr("err",""); sheetStep=2; pushNav(); renderCart(); return }
+  if(t.id==="nextBtn"){ var ne=orderError(); if(ne){showErr("err",ne);focusBad();return} showErr("err",""); sheetStep=2; pushNav(); renderCart(); return }
   if(t.id==="openCart"){openSheet();return}
   if(t.id==="closeCart"){closeSheet();return}
   if(t.dataset.rm){cart.splice(+t.dataset.rm,1);payClicked=false;paid=false;orderSaved=false;resetShot();sheetStep=1;updateBar();renderCart();closeSheet();toast("Commande retirée");return}
@@ -797,13 +1070,14 @@ document.addEventListener("click",function(e){
   if(t.dataset.p){payChoice=t.dataset.p;renderCart();return}
   if(t.id==="send"){
     var er2 = orderError();
-    if(er2){e.preventDefault();showErr("err",er2);$("num").focus();return}
+    if(er2){e.preventDefault();showErr("err",er2);focusBad();return}
     showErr("err","");
   }
 });
 $("sheet").addEventListener("click",function(e){if(e.target===this)closeSheet()});
 $("num").addEventListener("input",function(){renderInvoice();renderSteps();buildLink()});
-$("email").addEventListener("input",function(){renderSteps();buildLink()});
+$("email").addEventListener("input",function(){renderInvoice();renderSteps();buildLink()});
+$("cname").addEventListener("input",function(){renderInvoice();renderSteps();buildLink()});
 $("fabShare").addEventListener("click",function(){
   var url = location.href.split("#")[0];
   var text = "K-Bine CI : pass internet, pass appels et transfert d’unité Orange, MTN et Moov. Paiement avec Wave.";
@@ -817,12 +1091,20 @@ $("shot").addEventListener("change",function(){
   if(!f){ resetShot(); renderInvoice(); renderSteps(); buildLink(); return }
   var er = shotError(f);
   if(er){ resetShot(); showErr("txErr",er); renderInvoice(); renderSteps(); buildLink(); return }
-  if(shotUrl){try{URL.revokeObjectURL(shotUrl)}catch(e){}}
-  shot = f; shotUrl = URL.createObjectURL(f);
-  $("shotPrev").src = shotUrl; $("shotPrev").hidden = false;
-  $("shotBtn").textContent = "Changer la capture d'écran";
-  showErr("txErr","");
-  renderInvoice(); renderSteps(); buildLink();
+  /* Copie de l'image en mémoire dès le choix : le fichier de la galerie peut devenir illisible plus tard
+     (le client part payer dans Wave), ce qui faisait échouer l'envoi avec « Failed to fetch ». */
+  f.arrayBuffer().then(function(buf){
+    var copy = new Blob([buf],{type:f.type||"image/jpeg"});
+    if(shotUrl){try{URL.revokeObjectURL(shotUrl)}catch(e){}}
+    shot = copy; shotUrl = URL.createObjectURL(copy);
+    $("shotPrev").src = shotUrl; $("shotPrev").hidden = false;
+    $("shotBtn").textContent = "Changer la capture d'écran";
+    showErr("txErr","");
+    renderInvoice(); renderSteps(); buildLink();
+  }).catch(function(){
+    resetShot(); showErr("txErr","Impossible de lire cette image. Choisissez-la à nouveau.");
+    renderInvoice(); renderSteps(); buildLink();
+  });
 });
 document.addEventListener("keydown",function(e){
   if(e.key==="Escape")closeSheet();
@@ -836,6 +1118,7 @@ window.addEventListener("popstate",function(e){
   var st=e.state;
   if(!st){st={screen:"home",subOp:subOp,moovCat:null,sheet:false,step:1,i:0};idx=0}else{idx=st.i||0}
   applySnap(st);
+  if(moGoFlag){moGoFlag=false;screen="orders";renderTabs();renderView();window.scrollTo(0,0);pushNav()}
 });
 document.addEventListener("keydown",function(e){
   if(e.key==="Enter"&&e.target&&e.target.id==="num"){e.preventDefault();var nb=$("nextBtn");if(!nb.hidden&&!nb.classList.contains("off"))nb.click()}
