@@ -376,8 +376,7 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
     </div>
     <p class="err" id="err" hidden></p>
     <div class="dnbox" id="doneBox" hidden><span class="ok">&#10003;</span><b>Paiement déclaré</b><span class="note" id="doneNote"></span><span class="note" id="saveNote"></span></div>
-    <button type="button" class="btn ok" id="sendShare" hidden>Envoyer la capture et la facture sur WhatsApp</button>
-    <a class="btn" id="send" href="#" target="_blank" rel="noopener" hidden>Envoyer la commande sur WhatsApp</a>
+    <a class="btn ok" id="send" href="#" target="_blank" rel="noopener" hidden>Envoyer la facture à K-Bine CI sur WhatsApp</a>
     <button type="button" class="btn alt" id="trackBtn" hidden>Suivre ma commande</button>
     <p class="note" id="foot" hidden>Joignez la capture du reçu Wave dans la conversation WhatsApp.</p>
   </div>
@@ -518,7 +517,7 @@ function shotError(file){
 }
 function resetShot(){
   if(shotUrl){try{URL.revokeObjectURL(shotUrl)}catch(e){}}
-  shotUrl = ""; shot = null; invFile = null;
+  shotUrl = ""; shot = null;
   var i=$("shot"); if(i) i.value="";
   var p=$("shotPrev"); if(p){p.hidden=true;p.removeAttribute("src")}
   var b=$("shotBtn"); if(b) b.textContent="Choisir la capture d'écran";
@@ -794,89 +793,6 @@ function renderInvoice(){
     '<div class="ft">Merci pour votre confiance · K-Bine CI · WhatsApp '+esc(PHONE_SHOWN)+'</div></div>';
 }
 
-/* ----- Facture en image (logo, titres en gras, pointillés) : envoyée sur WhatsApp après la capture ----- */
-var invFile = null;
-function wrapLines(ctx,text,maxW){
-  var words=String(text).split(" "),lines=[],cur="";
-  words.forEach(function(w){var t=cur?cur+" "+w:w; if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w}else cur=t});
-  if(cur) lines.push(cur); return lines;
-}
-function loadImg(src){return new Promise(function(res){var i=new Image();i.onload=function(){res(i)};i.onerror=function(){res(null)};i.src=src})}
-function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
-function makeInvoiceBlob(){
-  var secs=invoiceSections(), W=900, P=56, F="'DM Sans','Segoe UI',Arial,sans-serif", FD="'Bricolage Grotesque','Trebuchet MS',Arial,sans-serif";
-  var fontsReady = (document.fonts&&document.fonts.load) ? Promise.all([document.fonts.load("700 26px 'DM Sans'"),document.fonts.load("800 40px 'Bricolage Grotesque'")]).catch(function(){}) : Promise.resolve();
-  return Promise.all([loadImg(IMG.logo),fontsReady]).then(function(res){
-    var logo=res[0], cv=document.createElement("canvas"), ctx=cv.getContext("2d");
-    ctx.font="700 26px "+F;
-    var VW=W-2*P-300, H=300;
-    secs.forEach(function(sc){H+=62; sc.rows.forEach(function(r){H+=Math.max(1,wrapLines(ctx,r[1],VW).length)*36+12})});
-    H+=262; cv.width=W; cv.height=H;
-    ctx.fillStyle="#fff"; ctx.fillRect(0,0,W,H);
-    var g=ctx.createLinearGradient(0,0,W,210); g.addColorStop(0,"#157a35"); g.addColorStop(1,"#1d8a3c");
-    ctx.fillStyle=g; ctx.fillRect(0,0,W,210);
-    ctx.fillStyle="#f07d00"; ctx.fillRect(0,210,W,8);
-    ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(P+60,105,60,0,Math.PI*2); ctx.fill();
-    if(logo){ctx.save();ctx.beginPath();ctx.arc(P+60,105,56,0,Math.PI*2);ctx.clip();ctx.drawImage(logo,P+4,49,112,112);ctx.restore()}
-    ctx.textBaseline="alphabetic"; ctx.textAlign="left"; ctx.fillStyle="#fff";
-    ctx.font="800 50px "+FD; ctx.fillText("K-BINE CI",P+142,98);
-    ctx.font="500 22px "+F; ctx.fillStyle="rgba(255,255,255,.92)"; ctx.fillText("Pass internet · Appels · Transfert d'unité",P+142,134);
-    ctx.textAlign="right"; ctx.fillStyle="#fff"; ctx.font="800 40px "+FD; ctx.fillText("FACTURE",W-P,80);
-    ctx.fillStyle="#fff1de"; ctx.fillRect(0,218,W,58);
-    ctx.fillStyle="#7a4300"; ctx.textAlign="left"; ctx.font="500 23px "+F; ctx.fillText("Réf. ",P,255);
-    var rw=ctx.measureText("Réf. ").width; ctx.font="800 23px "+F; ctx.fillText(orderRef,P+rw,255);
-    ctx.textAlign="right"; ctx.font="600 23px "+F; ctx.fillText(orderDate,W-P,255);
-    var y=336;
-    secs.forEach(function(sc){
-      ctx.textAlign="left"; ctx.fillStyle="#1d8a3c"; ctx.font="800 27px "+FD; ctx.fillText(sc.title.toUpperCase(),P,y);
-      var tw=ctx.measureText(sc.title.toUpperCase()).width;
-      ctx.save(); ctx.strokeStyle="#c9d6c9"; ctx.lineWidth=3; ctx.setLineDash([2,8]); ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(P+tw+16,y-9); ctx.lineTo(W-P,y-9); ctx.stroke(); ctx.restore();
-      y+=18;
-      sc.rows.forEach(function(r){
-        ctx.font="700 26px "+F; var vl=wrapLines(ctx,r[1],VW), rh=Math.max(1,vl.length)*36;
-        y+=34;
-        ctx.fillStyle="#f07d00"; ctx.beginPath(); ctx.arc(P+8,y-9,6,0,Math.PI*2); ctx.fill();
-        ctx.textAlign="left"; ctx.fillStyle="#5b6b60"; ctx.font="500 24px "+F; ctx.fillText(r[0],P+26,y);
-        ctx.textAlign="right"; ctx.fillStyle="#14231a"; ctx.font="700 26px "+F;
-        vl.forEach(function(t,i){ctx.fillText(t,W-P,y+i*36)});
-        y+=rh-36+14;
-        ctx.save(); ctx.strokeStyle="#dfe6dc"; ctx.lineWidth=2; ctx.setLineDash([2,7]); ctx.beginPath(); ctx.moveTo(P,y); ctx.lineTo(W-P,y); ctx.stroke(); ctx.restore();
-      });
-      y+=44;
-    });
-    y-=10;
-    ctx.fillStyle="#e4f3e8"; rrect(ctx,P,y,W-2*P,112,18); ctx.fill();
-    ctx.strokeStyle="#1d8a3c"; ctx.lineWidth=3; rrect(ctx,P,y,W-2*P,112,18); ctx.stroke();
-    ctx.textAlign="left"; ctx.fillStyle="#14231a"; ctx.font="800 30px "+FD; ctx.fillText("TOTAL À PAYER",P+30,y+68);
-    ctx.textAlign="right"; ctx.fillStyle="#1d8a3c"; ctx.font="800 46px "+FD; ctx.fillText(totalText(),W-P-30,y+72);
-    y+=112+58;
-    ctx.textAlign="center"; ctx.fillStyle="#14231a"; ctx.font="800 26px "+FD; ctx.fillText("Merci pour votre confiance",W/2,y);
-    ctx.fillStyle="#5b6b60"; ctx.font="500 21px "+F; ctx.fillText("K-Bine CI · Abidjan, Côte d'Ivoire · WhatsApp "+PHONE_SHOWN,W/2,y+36);
-    return new Promise(function(done){cv.toBlob(done,"image/png")});
-  });
-}
-function prepInvoice(){
-  return makeInvoiceBlob().then(function(b){invFile=new File([b],"facture-"+orderRef+".png",{type:"image/png"});return invFile});
-}
-function canShareFiles(){
-  try{return !!(navigator.canShare && navigator.share && navigator.canShare({files:[new File([new Blob(["x"])],"a.png",{type:"image/png"})]}))}catch(e){return false}
-}
-var CAN_SHARE_FILES = canShareFiles();
-function shareOrder(){
-  var er=orderError(); if(er){showErr("err",er);focusBad();return}
-  if(!shotValid()){showErr("err","Ajoutez la capture d'écran de votre paiement Wave.");return}
-  var msg="Bonjour K-Bine CI, voici ma commande :\n\n"+invoiceText();
-  function fallback(){window.open("https://wa.me/"+PHONE_INTL+"?text="+encodeURIComponent(msg),"_blank","noopener")}
-  var ext=({"image/png":"png","image/webp":"webp","image/gif":"gif","image/heic":"heic"})[shot.type]||"jpg";
-  var cap=new File([shot],"capture-paiement-"+orderRef+"."+ext,{type:shot.type||"image/jpeg"});
-  function go(inv){
-    var files=inv?[cap,inv]:[cap];   /* la capture en premier, puis la facture */
-    if(navigator.canShare && navigator.canShare({files:files})){
-      navigator.share({files:files,text:msg,title:"Commande K-Bine CI "+orderRef}).catch(function(e){if(!e||e.name!=="AbortError")fallback()});
-    } else fallback();
-  }
-  (invFile?Promise.resolve(invFile):prepInvoice()).then(go,function(){go(null)});
-}
 function renderSteps(){
   var has = cart.length && total()>0;
   var numOk = !orderError();
@@ -905,14 +821,9 @@ function renderSteps(){
   $("num").readOnly = paid; $("email").readOnly = paid; $("cname").readOnly = paid;
   $("doneBox").hidden = !(has && st===3 && paid);
   var ready = has && st===3 && paid && numOk && shotOk;
-  $("sendShare").hidden = !(ready && CAN_SHARE_FILES);
   $("send").hidden = !ready;
-  $("send").textContent = CAN_SHARE_FILES ? "Ou envoyer la facture en texte (sans la capture)" : "Envoyer la commande sur WhatsApp";
-  $("send").classList.toggle("alt", CAN_SHARE_FILES);
-  $("doneNote").textContent = CAN_SHARE_FILES
-    ? "Dernière étape : appuyez sur « Envoyer la capture et la facture sur WhatsApp », puis choisissez WhatsApp et le contact K-Bine CI ("+PHONE_SHOWN+"). La capture de votre paiement part en premier, suivie de la facture. Votre forfait est livré dès que votre paiement est vérifié."
-    : "Dernière étape : envoyez votre commande sur WhatsApp, puis joignez la capture d'écran de votre paiement (trombone, puis Galerie). Votre forfait est livré dès que votre paiement est vérifié.";
-  $("foot").textContent = CAN_SHARE_FILES ? "La capture et la facture sont envoyées ensemble : choisissez WhatsApp, puis le contact K-Bine CI." : "Joignez la capture du reçu Wave dans la conversation WhatsApp.";
+  $("doneNote").textContent = "Dernière étape : 1) appuyez sur « Envoyer la facture à K-Bine CI sur WhatsApp » : WhatsApp s'ouvre directement sur le numéro K-Bine CI ("+PHONE_SHOWN+"), puis appuyez sur Envoyer. 2) Dans la conversation, appuyez sur le trombone (ou +), puis Galerie, et choisissez la capture de votre paiement. Votre forfait est livré dès que votre paiement est vérifié.";
+  $("foot").textContent = "Après la facture, joignez la capture du reçu Wave dans la conversation WhatsApp (trombone, puis Galerie).";
   $("trackBtn").hidden = !(has && st===3 && paid);
   $("foot").hidden = st!==3;
 }
@@ -1052,11 +963,10 @@ document.addEventListener("click",function(e){
     addLine({key:"tf-"+tfOp+"-"+n+"-"+a,name:"Transfert d'unité vers "+OPNAME[tfOp],detail:n+" · ",kind:"tf",op:tfOp,dest:n,price:a,fee:Math.ceil(a*TRANSFER_RATE)},"Transfert validé");
     $("tfAmt").value="";return}
   if(t.id==="wavePay"){ if(orderError()){e.preventDefault();return} payClicked=true; setTimeout(renderSteps,0); return }
-  if(t.id==="sendShare"){ shareOrder(); return }
   if(t.id==="trackBtn"){ openOrders(); return }
   if(t.id==="moRefresh"){ moRefresh(true); return }
   if(t.id==="moFind"){ moFind(); return }
-  if(t.id==="paidBtn"){ if(!shotValid()){showErr("txErr",shotError()||"Ajoutez la capture d'écran de votre paiement Wave.");return} paid=true; sheetStep=3; pushNav(); renderCart(); invFile=null; prepInvoice().catch(function(){});
+  if(t.id==="paidBtn"){ if(!shotValid()){showErr("txErr",shotError()||"Ajoutez la capture d'écran de votre paiement Wave.");return} paid=true; sheetStep=3; pushNav(); renderCart();
     $("saveNote").textContent="";
     uploadErr = "";
     moRemember(); var moRef = orderRef;
