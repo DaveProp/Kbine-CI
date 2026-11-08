@@ -155,6 +155,7 @@ input[type=tel],input[type=number],input[type=text]{width:100%;font:inherit;padd
 .mo-d{margin:0;color:var(--muted);font-size:.86rem}
 .mo-can{background:#fbe9e7;color:var(--danger);border-radius:10px;padding:8px 12px;font-weight:700;font-size:.86rem}
 .mo-warn{background:var(--orange-soft);color:#7a4300;border-radius:10px;padding:8px 12px;font-size:.82rem}
+.mo-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mo-acts .qbtn{padding:10px;border-radius:12px;font-weight:700;font-size:.9rem}
 .mo-wa{display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:12px;padding:10px;font-weight:700;font-size:.9rem;color:#06220f;background:#25d366}
 .mo-empty{display:grid;gap:4px;text-align:center;padding:22px 14px;border:1.5px dashed var(--line);border-radius:16px;color:var(--muted);margin:10px 0}
 .mo-empty b{color:var(--fg)}
@@ -392,6 +393,11 @@ var WAVE_LINK = "https://pay.wave.com/m/M_ci_fAtDWzspJqhS/c/ci/";
 var TRANSFER_MIN = 300;
 var TRANSFER_RATE = 0.10;
 var SUB_FEE = 100;
+/* Pass de plus de SUB_FEE_FROM F : frais de service = SUB_FEE_PCT du prix (au lieu de SUB_FEE F fixes) */
+var SUB_FEE_PCT = 0.10;
+var SUB_FEE_FROM = 2000;
+function subFee(price){ return price>SUB_FEE_FROM ? Math.ceil(price*SUB_FEE_PCT) : SUB_FEE }
+function subFeeNote(price){ return "+ "+fmt(subFee(price))+" de frais de service"+(price>SUB_FEE_FROM?" ("+Math.round(SUB_FEE_PCT*100)+" %)":"") }
 /* Facultatif : votre délai ou vos horaires, affichés sur l'accueil. Ex. "livraison en 5 à 15 min" */
 var DELAI_TXT = "";
 var PAYMENTS = ["Wave"];
@@ -435,7 +441,7 @@ function orderError(){
 
 /* ===== Base de données (Supabase) : enregistrement des commandes + prix modifiables depuis l'admin ===== */
 var DB = (function(){var c=window.KB_CONFIG;return (c&&c.url&&c.key&&!/VOTRE-/.test(c.url))?c:null})();
-var orderSaved = false, uploadErr = "";
+var orderSaved = false, uploadErr = "", paying = false;
 function dbFetch(path,opt){
   opt = opt||{};
   /* Les nouvelles clés "sb_publishable_..." ne sont pas des JWT : on les envoie seulement dans apikey */
@@ -530,7 +536,7 @@ function moovCard(p){
   return '<article class="card tap" data-add="'+p.id+'" role="button" tabindex="0" aria-label="Choisir : '+esc(p.name)+'">'+
     '<div class="op"><img src="'+IMG[p.op]+'" alt="">'+OPNAME[p.op]+'</div>'+
     '<h3>'+esc(p.name)+'</h3><p>'+esc(p.note)+'</p>'+
-    '<div class="price">'+(np?'<small>Prix sur demande</small>':fmt(p.price))+'</div>'+(np?'':'<p class="note">+ '+fmt(SUB_FEE)+' de frais de service</p>')+
+    '<div class="price">'+(np?'<small>Prix sur demande</small>':fmt(p.price))+'</div>'+(np?'':'<p class="note">'+subFeeNote(p.price)+'</p>')+
     '</article>';
 }
 function moovGroups(items){
@@ -706,7 +712,7 @@ function renderView(){
         '<div class="grid">'+c2.items.map(function(p){
         return '<article class="card"><div class="op"><img src="'+IMG[p.op]+'" alt="">'+OPNAME[p.op]+'</div>'+
           '<h3>'+esc(p.name)+'</h3><p>'+esc(p.note)+'</p>'+
-          '<div class="price">'+(p.price===null?'<small>Prix sur demande</small>':fmt(p.price))+'</div>'+(p.price===null?'':'<p class="note">+ '+fmt(SUB_FEE)+' de frais de service</p>')+
+          '<div class="price">'+(p.price===null?'<small>Prix sur demande</small>':fmt(p.price))+'</div>'+(p.price===null?'':'<p class="note">'+subFeeNote(p.price)+'</p>')+
           '<button class="add'+(p.price===null?' ghost':'')+'" type="button" data-add="'+p.id+'">'+(p.price===null?'Demander le prix':'Ajouter')+'</button></article>';
       }).join("")+'</div>';
     }
@@ -764,7 +770,7 @@ function invoiceSections(){
     if(l.cat) od.push(["Catégorie",l.cat]);
     od.push(["Forfait",l.name]);
     if(l.note) od.push(["Contenu et durée",l.note]);
-    am.push(["Prix du forfait",l.price===null?"à confirmer":fmt(l.price)],["Frais de service",fmt(l.fee||0)]);
+    am.push(["Prix du forfait",l.price===null?"à confirmer":fmt(l.price)],["Frais de service"+(l.price>SUB_FEE_FROM?" ("+Math.round(SUB_FEE_PCT*100)+" %)":""),fmt(l.fee||0)]);
   }
   var py=[["Mode de paiement",payChoice],["Statut",paid?"Payé (déclaré par le client)":"En attente de paiement"]];
   if(shot) py.push(["Capture du paiement","Jointe"]);
@@ -846,22 +852,21 @@ function buildLink(){
 /* ===== Mes commandes : suivi de l'état des commandes ===== */
 var MO_KEY="kb_orders", moBusy=false, moMsg="", moGoFlag=false;
 var MO_STAGES=[
-  {t:"Commande reçue",d:"Votre paiement est déclaré et en cours de vérification."},
-  {t:"Paiement vérifié",d:"Votre paiement est confirmé, votre forfait est en préparation."},
+  {t:"Commande reçue",d:"Votre paiement est déclaré. K-Bine CI le vérifie, puis livre votre forfait."},
   {t:"Forfait livré",d:"Votre forfait a été livré. Merci pour votre confiance."}];
 function moLoad(){try{var a=JSON.parse(localStorage.getItem(MO_KEY)||"[]");return Array.isArray(a)?a:[]}catch(e){return []}}
 function moSave(a){try{a.sort(function(x,y){return String(y.date).localeCompare(String(x.date))});localStorage.setItem(MO_KEY,JSON.stringify(a.slice(0,50)))}catch(e){}}
 function moStage(st){
   var x=String(st||"").toLowerCase();
-  if(/cancel|annul|reject|refus|fail|[eé]chou/.test(x)) return -1;
-  if(/deliver|livr|complet|termin|done/.test(x)) return 3;
-  if(/verif|vérif|valid|confirm|approv/.test(x)) return 2;
+  if(/reject|refus|cancel|annul|fail|[eé]chou/.test(x)) return -1;
+  if(/deliver|livr|complet|termin|done/.test(x)) return 2;
   return 1;
 }
 function moRemember(){
   var l=cart[0]; if(!l) return;
   var a=moLoad().filter(function(o){return o.ref!==orderRef});
-  a.push({ref:orderRef,item:l.name,total:total(),op:l.op,phone:cleanNum($("num").value),email:$("email").value.trim(),date:new Date().toISOString(),status:"paid_declared",synced:false});
+  a.push({ref:orderRef,item:l.name,total:total(),op:l.op,phone:cleanNum($("num").value),email:$("email").value.trim(),name:nameClean(),
+    kind:l.kind||"sub",cat:l.cat||"",note:l.note||"",price:l.price,fee:l.fee||0,dest:l.dest||"",date:new Date().toISOString(),status:"paid_declared",synced:false});
   moSave(a);
 }
 function moMark(ref){var a=moLoad();a.forEach(function(o){if(o.ref===ref)o.synced=true});moSave(a)}
@@ -880,11 +885,12 @@ function moCard(o){
   var wa="https://wa.me/"+PHONE_INTL+"?text="+encodeURIComponent("Bonjour K-Bine CI, où en est ma commande "+o.ref+" ("+o.item+") ?");
   return '<article class="mo-card"><div class="mo-top">'+(IMG[o.op]?'<img src="'+IMG[o.op]+'" alt="">':'')+
     '<div class="m"><b>'+esc(o.item||"Commande")+'</b><span>Réf. '+esc(o.ref)+' · '+esc(moDate(o.date))+'</span></div><span class="mo-tot">'+esc(fmt(o.total||0))+'</span></div>'+
-    '<span class="mo-b '+(cx?"sx":"s"+st)+'">'+(cx?"Annulée":(st===1?"En cours de vérification":(st===2?"Paiement vérifié":"Livrée")))+'</span>'+
-    (cx?'<div class="mo-can">Cette commande a été annulée. Contactez-nous sur WhatsApp pour plus d’informations.</div>'
-       :stepperHTML(["Reçue","Vérifiée","Livrée"],st===3?4:st)+'<p class="mo-d">'+esc(MO_STAGES[st-1].d)+'</p>')+
+    '<span class="mo-b '+(cx?"sx":"s"+st)+'">'+(cx?"Refusée":(st===1?"En cours de traitement":"Livrée"))+'</span>'+
+    (cx?'<div class="mo-can">Cette commande a été refusée (paiement non confirmé ou erreur sur le numéro). Contactez-nous sur WhatsApp, nous allons vous aider.</div>'
+       :stepperHTML(["Reçue","Livrée"],st===2?3:st)+'<p class="mo-d">'+esc(MO_STAGES[st-1].d)+'</p>')+
     (o.synced===false&&DB?'<div class="mo-warn">Cette commande n’a pas pu être enregistrée en ligne : envoyez-la bien sur WhatsApp pour qu’elle soit traitée.</div>':'')+
-    '<a class="mo-wa" href="'+esc(wa)+'" target="_blank" rel="noopener">Une question sur cette commande ? WhatsApp</a></article>';
+    '<div class="mo-acts"><button type="button" class="qbtn" data-moinv="'+esc(o.ref)+'">Télécharger ma facture</button>'+
+    '<a class="mo-wa" href="'+esc(wa)+'" target="_blank" rel="noopener">Une question ? WhatsApp</a></div></article>';
 }
 function moListHTML(){
   var a=moLoad();
@@ -933,6 +939,113 @@ function moFind(){
     moPaint();
   },function(e){moMsg=moErrText(e);moPaint()});
 }
+
+function moSections(o){
+  var cx=moStage(o.status), tf=o.kind==="tf";
+  var cl=[["Nom",o.name||"Client"],["Email",o.email||"—"],[tf?"Numéro de l'expéditeur":"Numéro à recharger",o.phone||"—"]];
+  var od=[["Service",tf?"Transfert d'unité":"Souscription"],["Opérateur",OPNAME[o.op]||o.op||"—"]];
+  if(tf&&o.dest) od.push(["Numéro du bénéficiaire",o.dest]);
+  if(o.cat) od.push(["Catégorie",o.cat]);
+  od.push([tf?"Désignation":"Forfait",o.item||"—"]);
+  if(o.note) od.push(["Contenu et durée",o.note]);
+  var am=[];
+  if(o.price!=null&&o.price!==undefined&&!isNaN(o.price)){am.push([tf?"Montant transféré":"Prix du forfait",fmt(o.price)]);am.push(["Frais de service",fmt(o.fee||0)])}
+  var py=[["Mode de paiement","Wave"],["Statut",cx<0?"Refusée":(cx===2?"Livrée":"Payé (déclaré), en traitement")]];
+  var out=[{title:"Client",rows:cl},{title:"Détails de la commande",rows:od}];
+  if(am.length) out.push({title:"Montant",rows:am});
+  out.push({title:"Paiement",rows:py}); return out;
+}
+function wrapLines(ctx,text,maxW){
+  var words=String(text).split(" "),lines=[],cur="";
+  words.forEach(function(w){var t=cur?cur+" "+w:w; if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w}else cur=t});
+  if(cur) lines.push(cur); return lines;
+}
+function loadImg(src){return new Promise(function(res){var i=new Image();i.onload=function(){res(i)};i.onerror=function(){res(null)};i.src=src})}
+function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function moInvoiceBlob(o){
+  var secs=moSections(o), W=900, P=56, F="'DM Sans','Segoe UI',Arial,sans-serif", FD="'Bricolage Grotesque','Trebuchet MS',Arial,sans-serif";
+  var fr=(document.fonts&&document.fonts.load)?Promise.all([document.fonts.load("700 26px 'DM Sans'"),document.fonts.load("800 40px 'Bricolage Grotesque'")]).catch(function(){}):Promise.resolve();
+  return Promise.all([loadImg(IMG.logo),fr]).then(function(res){
+    var logo=res[0], cv=document.createElement("canvas"), ctx=cv.getContext("2d");
+    ctx.font="700 26px "+F;
+    var VW=W-2*P-300, H=300;
+    secs.forEach(function(sc){H+=62; sc.rows.forEach(function(r){H+=Math.max(1,wrapLines(ctx,r[1],VW).length)*36+12})});
+    H+=262; cv.width=W; cv.height=H;
+    ctx.fillStyle="#fff"; ctx.fillRect(0,0,W,H);
+    var g=ctx.createLinearGradient(0,0,W,210); g.addColorStop(0,"#157a35"); g.addColorStop(1,"#1d8a3c");
+    ctx.fillStyle=g; ctx.fillRect(0,0,W,210); ctx.fillStyle="#f07d00"; ctx.fillRect(0,210,W,8);
+    ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(P+60,105,60,0,Math.PI*2); ctx.fill();
+    if(logo){ctx.save();ctx.beginPath();ctx.arc(P+60,105,56,0,Math.PI*2);ctx.clip();ctx.drawImage(logo,P+4,49,112,112);ctx.restore()}
+    ctx.textBaseline="alphabetic"; ctx.textAlign="left"; ctx.fillStyle="#fff";
+    ctx.font="800 50px "+FD; ctx.fillText("K-BINE CI",P+142,98);
+    ctx.font="500 22px "+F; ctx.fillStyle="rgba(255,255,255,.92)"; ctx.fillText("Pass internet · Appels · Transfert d'unité",P+142,134);
+    ctx.textAlign="right"; ctx.fillStyle="#fff"; ctx.font="800 40px "+FD; ctx.fillText("FACTURE",W-P,80);
+    ctx.fillStyle="#fff1de"; ctx.fillRect(0,218,W,58);
+    ctx.fillStyle="#7a4300"; ctx.textAlign="left"; ctx.font="500 23px "+F; ctx.fillText("Réf. ",P,255);
+    var rw=ctx.measureText("Réf. ").width; ctx.font="800 23px "+F; ctx.fillText(o.ref,P+rw,255);
+    ctx.textAlign="right"; ctx.font="600 23px "+F; ctx.fillText(moDate(o.date),W-P,255);
+    var y=336;
+    secs.forEach(function(sc){
+      ctx.textAlign="left"; ctx.fillStyle="#1d8a3c"; ctx.font="800 27px "+FD; ctx.fillText(sc.title.toUpperCase(),P,y);
+      var tw=ctx.measureText(sc.title.toUpperCase()).width;
+      ctx.save(); ctx.strokeStyle="#c9d6c9"; ctx.lineWidth=3; ctx.setLineDash([2,8]); ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(P+tw+16,y-9); ctx.lineTo(W-P,y-9); ctx.stroke(); ctx.restore();
+      y+=18;
+      sc.rows.forEach(function(r){
+        ctx.font="700 26px "+F; var vl=wrapLines(ctx,r[1],VW), rh=Math.max(1,vl.length)*36;
+        y+=34; ctx.fillStyle="#f07d00"; ctx.beginPath(); ctx.arc(P+8,y-9,6,0,Math.PI*2); ctx.fill();
+        ctx.textAlign="left"; ctx.fillStyle="#5b6b60"; ctx.font="500 24px "+F; ctx.fillText(r[0],P+26,y);
+        ctx.textAlign="right"; ctx.fillStyle="#14231a"; ctx.font="700 26px "+F;
+        vl.forEach(function(t,i){ctx.fillText(t,W-P,y+i*36)});
+        y+=rh-36+14;
+        ctx.save(); ctx.strokeStyle="#dfe6dc"; ctx.lineWidth=2; ctx.setLineDash([2,7]); ctx.beginPath(); ctx.moveTo(P,y); ctx.lineTo(W-P,y); ctx.stroke(); ctx.restore();
+      });
+      y+=44;
+    });
+    y-=10;
+    ctx.fillStyle="#e4f3e8"; rrect(ctx,P,y,W-2*P,112,18); ctx.fill();
+    ctx.strokeStyle="#1d8a3c"; ctx.lineWidth=3; rrect(ctx,P,y,W-2*P,112,18); ctx.stroke();
+    ctx.textAlign="left"; ctx.fillStyle="#14231a"; ctx.font="800 30px "+FD; ctx.fillText("TOTAL PAYÉ",P+30,y+68);
+    ctx.textAlign="right"; ctx.fillStyle="#1d8a3c"; ctx.font="800 46px "+FD; ctx.fillText(fmt(o.total||0),W-P-30,y+72);
+    y+=112+58;
+    ctx.textAlign="center"; ctx.fillStyle="#14231a"; ctx.font="800 26px "+FD; ctx.fillText("Merci pour votre confiance",W/2,y);
+    ctx.fillStyle="#5b6b60"; ctx.font="500 21px "+F; ctx.fillText("K-Bine CI · Abidjan, Côte d'Ivoire · WhatsApp "+PHONE_SHOWN,W/2,y+36);
+    return new Promise(function(done){cv.toBlob(done,"image/png")});
+  });
+}
+function moDownload(ref){
+  var o=null; moLoad().forEach(function(x){if(x.ref===ref)o=x}); if(!o) return;
+  moInvoiceBlob(o).then(function(b){
+    if(!b){toast("Facture indisponible");return}
+    var a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="facture-"+o.ref+".png";
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href)},4000);
+    toast("Facture téléchargée");
+  }).catch(function(){toast("Facture indisponible")});
+}
+/* ===== Protection contre les doublons ===== */
+var SHOT_KEY="kb_shots";
+function shotHash(){
+  var b=shot; if(!b) return Promise.resolve("");
+  var fb=function(){return b.size+":"+(b.type||"")};
+  try{
+    if(!(window.crypto&&crypto.subtle&&b.arrayBuffer)) return Promise.resolve(fb());
+    return b.arrayBuffer().then(function(buf){return crypto.subtle.digest("SHA-256",buf)}).then(function(d){
+      return Array.prototype.map.call(new Uint8Array(d),function(x){return ("0"+x.toString(16)).slice(-2)}).join("");
+    }).catch(fb);
+  }catch(e){return Promise.resolve(fb())}
+}
+function shotsLoad(){try{var a=JSON.parse(localStorage.getItem(SHOT_KEY)||"{}");return a&&typeof a==="object"?a:{}}catch(e){return {}}}
+function shotsAdd(h,ref){var a=shotsLoad();a[h]=ref;var k=Object.keys(a);if(k.length>60)delete a[k[0]];try{localStorage.setItem(SHOT_KEY,JSON.stringify(a))}catch(e){}}
+/* renvoie un texte d'erreur (bloquant), "" si tout va bien, ou "?confirm:..." pour demander confirmation */
+function dupCheck(h){
+  var used=shotsLoad()[h];
+  if(h&&used&&used!==orderRef) return "Cette capture d'écran a déjà été utilisée pour la commande "+used+". Ajoutez la capture de ce nouveau paiement Wave.";
+  var l=cart[0], ph=cleanNum($("num").value), now=Date.now(), dup=null;
+  moLoad().forEach(function(o){
+    if(o.ref!==orderRef && o.phone===ph && o.item===l.name && o.total===total() && now-new Date(o.date).getTime()<10*60000) dup=o;
+  });
+  return dup?"?confirm:Une commande identique ("+dup.ref+") a déjà été envoyée il y a moins de 10 minutes. Voulez-vous vraiment en envoyer une autre ?":"";
+}
+
 function openOrders(){
   if(!$("sheet").hidden){
     var n=idx-sheetBase;
@@ -953,7 +1066,7 @@ document.addEventListener("click",function(e){
   if(t.dataset.op){moovCat=null;subOp=t.dataset.op;tab="pop";screen="sub";renderTabs();renderView();window.scrollTo(0,0);pushNav();return}
   if(t.dataset.go){moovCat=null;screen=t.dataset.go;renderTabs();renderView();window.scrollTo(0,0);pushNav();return}
   if(t.dataset.t){tab=t.dataset.t;screen="sub";renderTabs();renderView();return}
-  if(t.dataset.add){var p=findItem(t.dataset.add);addLine({key:p.id,name:p.name,op:p.op,note:p.note,cat:curCatLabel(),price:p.price,fee:(p.price===null?0:SUB_FEE),detail:""});return}
+  if(t.dataset.add){var p=findItem(t.dataset.add);addLine({key:p.id,name:p.name,op:p.op,note:p.note,cat:curCatLabel(),price:p.price,fee:(p.price===null?0:subFee(p.price)),detail:""});return}
   if(t.dataset.o){var _n=$("tfNum").value,_a=$("tfAmt").value;tfOp=t.dataset.o;renderView();$("tfNum").value=_n;$("tfAmt").value=_a;return}
   if(t.id==="tfAdd"){
     var n=$("tfNum").value.trim(), a=parseInt($("tfAmt").value,10);
@@ -965,12 +1078,23 @@ document.addEventListener("click",function(e){
   if(t.id==="wavePay"){ if(orderError()){e.preventDefault();return} payClicked=true; setTimeout(renderSteps,0); return }
   if(t.id==="trackBtn"){ openOrders(); return }
   if(t.id==="moRefresh"){ moRefresh(true); return }
+  if(t.dataset.moinv){ moDownload(t.dataset.moinv); return }
   if(t.id==="moFind"){ moFind(); return }
-  if(t.id==="paidBtn"){ if(!shotValid()){showErr("txErr",shotError()||"Ajoutez la capture d'écran de votre paiement Wave.");return} paid=true; sheetStep=3; pushNav(); renderCart();
-    $("saveNote").textContent="";
-    uploadErr = "";
-    moRemember(); var moRef = orderRef;
-    saveOrder().then(function(ok){ if(ok) moMark(moRef); if(DB) $("saveNote").textContent = (ok ? (uploadErr ? "Commande enregistrée, mais capture non envoyée : " : "Commande enregistrée.") : "Enregistrement en ligne impossible : envoyez bien la commande sur WhatsApp. ") + (uploadErr && (!ok || true) ? " ["+uploadErr+"]" : "") });
+  if(t.id==="paidBtn"){
+    if(!shotValid()){showErr("txErr",shotError()||"Ajoutez la capture d'écran de votre paiement Wave.");return}
+    if(paid||paying) return;
+    paying=true; t.classList.add("off");
+    shotHash().then(function(h){
+      var d=dupCheck(h);
+      if(d.indexOf("?confirm:")===0){ if(!window.confirm(d.slice(9))){paying=false;renderSteps();return} d="" }
+      if(d){paying=false;showErr("txErr",d);renderSteps();return}
+      paying=false; shotsAdd(h,orderRef);
+      paid=true; sheetStep=3; pushNav(); renderCart();
+      $("saveNote").textContent="";
+      uploadErr = "";
+      moRemember(); var moRef = orderRef;
+      saveOrder().then(function(ok){ if(ok) moMark(moRef); if(DB) $("saveNote").textContent = (ok ? (uploadErr ? "Commande enregistrée, mais capture non envoyée : " : "Commande enregistrée.") : "Enregistrement en ligne impossible : envoyez bien la commande sur WhatsApp. ") + (uploadErr && (!ok || true) ? " ["+uploadErr+"]" : "") });
+    });
     return }
   if(t.id==="nextBtn"){ var ne=orderError(); if(ne){showErr("err",ne);focusBad();return} showErr("err",""); sheetStep=2; pushNav(); renderCart(); return }
   if(t.id==="openCart"){openSheet();return}
